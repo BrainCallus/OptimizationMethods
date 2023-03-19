@@ -11,17 +11,15 @@ def draw_function_graph(given_matrix, func, grad, lr=None, eps=None):
     np.seterr(over='ignore')
     start = [-120, 150]
     if eps is None:
-        a = func([0, 1])
-        b = func([1, 0])
-        eps = math.e * max(a, b) / min(a, b)
+        eps = 10 ** (-4)
     if lr is None:
         lr = 0.0005
 
     learning_rate = gen_learning_rate(lr)
-    points1 = method_mas(learning_rate, start, 4, func, grad, eps)
+    points1 = using_grad_vector(learning_rate, start, eps, func, grad)
     xs1 = [i[0] for i in points1[1][-1]]
     ys1 = [i[1] for i in points1[1][-1]]
-    points2 = method_mas(golden, start, 4, func, grad, eps)
+    points2 = method_mas(golden, start, eps, func, grad)
     xs2 = [i[0] for i in points2[1][-1]]
     ys2 = [i[1] for i in points2[1][-1]]
 
