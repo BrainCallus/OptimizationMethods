@@ -14,11 +14,12 @@ def main():
     #         func, grad, matrix = generate_random_function(dimensions, self_number)
     #         analyze_function(dimensions, func, grad)
 
-    # a = [[6, 0], [0, 1]]
-    # func = function_generator(dimensions, a)
-    # grad = gradient_generator(dimensions, a)
-    # draw_function_graph(a, func, grad, 0.1)
-    #
+    dimensions = 2
+    self_number = 3
+    func, grad, a = generate_random_function_quadratic(dimensions, self_number)
+    draw_function_graph(a, func, grad)
+
+
     # a = [[1, -1], [0, 2]]
     # func = function_generator(dimensions, a)
     # grad = gradient_generator(dimensions, a)
@@ -31,15 +32,15 @@ def main():
 
 
 
-    for i in range(1, 1001, 100):
-        for j in range(2, 1002, 100):
-            dimensions = i
-            self_number = j
-            func, grad, vector = generate_random_function_vector(dimensions, self_number)
-
-            print('Перем : ' + str(dimensions))
-            print('Собств: ' + str(self_number))
-            analyze_function(dimensions, func, grad, vector)
+    # for i in range(1, 1001, 100):
+    #     for j in range(2, 1002, 100):
+    #         dimensions = i
+    #         self_number = j
+    #         func, grad, vector = generate_random_function_vector(dimensions, self_number)
+    #
+    #         print('Перем : ' + str(dimensions))
+    #         print('Собств: ' + str(self_number))
+    #         analyze_function(dimensions, func, grad, vector)
 
 
     # analyze_function(2, lambda a: a[0]**2 + 302 * a[1]**2, lambda a: np.asarray([a[0]*2, 302 * a[1]*2]), [1, 302])
