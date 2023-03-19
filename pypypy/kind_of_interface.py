@@ -78,12 +78,6 @@ def analyze_function(n, func, grad, vector=None):
     print('---------------')
 
 
-def generate_random_function_quadratic(n, k):
-    main_matrix = matrix_out_of_vector(n, generate_diagonal_1(k, n))
-    func = function_generator(n, main_matrix)
-    grad = gradient_generator(n, main_matrix)
-    return func, grad, main_matrix
-
 def generate_random_function_vector(n, k):
     main_vector = generate_diagonal_1(k, n)
     func = function_generator_vector(n, main_vector)
