@@ -56,9 +56,6 @@ def analyze_function(n, func, grad, vector=None):
     learning_rate = gen_learning_rate(lr)
     points1 = method_mas(learning_rate, start, 4, func, grad, eps)
 
-    workbook = Workbook()
-    sheet = workbook.active
-
     print('---')
     print("Градиентный спуск")
     print('Функ: ' + str(points1[0]))
