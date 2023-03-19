@@ -3,7 +3,6 @@ from pypypy.methods import *
 from pypypy.out_functions import *
 from matplotlib import pyplot as plt
 from PIL import Image
-from openpyxl import Workbook
 
 
 def draw_function_graph(given_matrix, func, grad, lr=None, eps=None):
