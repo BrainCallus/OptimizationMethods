@@ -31,7 +31,7 @@ def golden(x, eps, func, grad):
     return i, (a + b) / 2
 
 
-def learning_rate_vector(method, x, eps, func, grad):
+def using_grad_vector(method, x, eps, func, grad):
     func_value = func(x)
     steps_x = [x]
     steps_y = [func_value]
@@ -56,7 +56,7 @@ def method_mas(method, x, iteration_numb, func, grad, eps=None):
     func_calls = 0
     i = 0
     for i in range(1, iteration_numb):
-        f_c, step_x, step_y = learning_rate_vector(method, x, math.pow(eps, -i), func, grad)
+        f_c, step_x, step_y = using_grad_vector(method, x, math.pow(eps, -i), func, grad)
         xs.append(step_x)
         ys.append(step_y)
         func_calls += f_c
