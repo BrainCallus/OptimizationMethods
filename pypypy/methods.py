@@ -46,8 +46,8 @@ def wolfe(x, eps, f):
         y = np.reshape(y,(dim,1))
         s = np.reshape(s,(dim,1))
         r = 1/(y.T@s)
-        l_i = (np.eye(2)-(r*((s@(y.T)))))
-        r_i = (np.eye(2)-(r*((y@(s.T)))))
+        l_i = (np.eye(dim)-(r*((s@(y.T)))))
+        r_i = (np.eye(dim)-(r*((y@(s.T)))))
         hess_inter = l_i@H@r_i
         H = hess_inter + (r*((s@(s.T))))
         nabl = new_nabl[:]
