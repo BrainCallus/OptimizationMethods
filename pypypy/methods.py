@@ -2,16 +2,16 @@ import math
 import numpy as np
 
 def grad(f,x):
-    h = np.cbrt(np.finfo(float).eps)
-    d = len(x)
-    nabla = np.zeros(d)
-    for i in range(d):
-        x_for = np.copy(x)
-        x_back = np.copy(x)
-        x_for[i] += h
-        x_back[i] -= h
-        nabla[i] = (f(x_for) - f(x_back))/(2*h)
-    return nabla
+    delta = np.cbrt(np.finfo(float).eps)
+    dim = len(x)
+    nabl = np.zeros(dim)
+    for i in range(dim):
+        x_first = np.copy(x)
+        x_second = np.copy(x)
+        x_first[i] += delta
+        x_second[i] -= delta
+        nabl[i] = (f(x_first) - f(x_second))/(2*delta)
+    return nabl
 
 
 def line_search(x, p, f, nabl):
@@ -29,9 +29,9 @@ def line_search(x, p, f, nabl):
 
 def wolfe(x, eps, f):
     dim = len(x)
-    steps_x = [x]
-    steps_y = [f(x)]
-    H = np.eye(dim)
+    steps_arg = [x]
+    steps_f = [f(x)]
+    H = np.eye(dim) ##approximate Hessian
     i = 0
     nabl = grad(f, x)
     while np.linalg.norm(nabl) > eps:
@@ -46,15 +46,15 @@ def wolfe(x, eps, f):
         y = np.reshape(y,(dim,1))
         s = np.reshape(s,(dim,1))
         r = 1/(y.T@s)
-        li = (np.eye(2)-(r*((s@(y.T)))))
-        ri = (np.eye(2)-(r*((y@(s.T)))))
-        hess_inter = li@H@ri
+        l_i = (np.eye(2)-(r*((s@(y.T)))))
+        r_i = (np.eye(2)-(r*((y@(s.T)))))
+        hess_inter = l_i@H@r_i
         H = hess_inter + (r*((s@(s.T))))
         nabl = new_nabl[:]
         x = x+alf*p
-        steps_x.append(x)
-        steps_y.append(f(x))
-    return i, steps_x, steps_y
+        steps_arg.append(x)
+        steps_f.append(f(x))
+    return i, steps_arg, steps_f
 
 
 def gen_learning_rate(lr_step):
