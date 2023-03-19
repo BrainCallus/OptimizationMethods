@@ -8,11 +8,11 @@ from PIL import Image
 def draw_function_graph(given_matrix, func, grad, lr=None, eps=None):
     np.seterr(invalid='ignore')
     np.seterr(over='ignore')
-    start = [-120, 150]
+    start = [120, -120]
     if eps is None:
-        eps = 10 ** (-4)
+        eps = 0.001
     if lr is None:
-        lr = 0.0005
+        lr = 0.01
 
     learning_rate = gen_learning_rate(lr)
     points1 = using_grad_vector(learning_rate, start, eps, func, grad)
@@ -23,9 +23,10 @@ def draw_function_graph(given_matrix, func, grad, lr=None, eps=None):
     ys2 = [i[1] for i in points2[1]]
 
     left = min(min(xs1), min(xs2))
-    right = max(max(ys1), max(ys2))
+    right = max(max(xs1), max(xs2))
     up = max(max(ys1), max(ys2))
     bottom = min(min(ys1), min(ys2))
+
 
     x0 = np.linspace(left - 10, right + 10, 1000)
     y0 = np.linspace(bottom - 10, up + 10, 1000)
