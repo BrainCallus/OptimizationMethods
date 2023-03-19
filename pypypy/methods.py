@@ -1,23 +1,4 @@
 import math
-
-def gen_learning_rate(lr_step):
-    def lr_func(*args, **kwarg):
-        return 0, lr_step
-
-    return lr_func
-
-
-def golden(x, eps, func, grad):
-    a, b = 0, 1
-    k1, k2 = (3 - math.pow(5, 0.5)) / 2, (math.pow(5, 0.5) - 1) / 2
-    l1, l2 = a + k1 * (b - a), a + k2 * (b - a)
-    grr = grad(x)
-    xx1 = x - l1 * grr
-    xx2 = x - l2 * grr
-    f1, f2 = func(xx1), func(xx2)
-    i = 4
-    while (b - a) / 2 >= eps:
-        i += 1import math
 import numpy as np
 
 def grad(f,x):
@@ -33,7 +14,6 @@ def grad(f,x):
     return nabla
 
 
-
 def line_search(x, p, f, nabl):
   alf = 1
   c1 = 1e-4
@@ -47,23 +27,22 @@ def line_search(x, p, f, nabl):
     new_nabl = grad(f, new_x)
   return alf
 
-def wolfe(x, eps, f, *args):
-    ##x= [startX,startX]
+def wolfe(x, eps, f):
     dim = len(x)
     steps_x = [x]
     steps_y = [f(x)]
     H = np.eye(dim)
     i = 0
-    nabl = grad(f,x)
-    while np.linalg.norm(nabl)>eps:
-        i=i+1
+    nabl = grad(f, x)
+    while np.linalg.norm(nabl) > eps:
+        i += 1
         p = -H@nabl
         alf = line_search(x,p,f,nabl)
         s = alf*p
         new_nabl = grad(f,x+alf*p)
         y = new_nabl - nabl
-        y = np.array([y])
-        s = np.array([s])
+        y = np.array([y], dtype='float64')
+        s = np.array([s], dtype='float64')
         y = np.reshape(y,(dim,1))
         s = np.reshape(s,(dim,1))
         r = 1/(y.T@s)
