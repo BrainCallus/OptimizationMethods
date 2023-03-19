@@ -16,11 +16,11 @@ def draw_function_graph(given_matrix, func, grad, lr=None, eps=None):
 
     learning_rate = gen_learning_rate(lr)
     points1 = using_grad_vector(learning_rate, start, eps, func, grad)
-    xs1 = [i[0] for i in points1[1][-1]]
-    ys1 = [i[1] for i in points1[1][-1]]
-    points2 = method_mas(golden, start, eps, func, grad)
-    xs2 = [i[0] for i in points2[1][-1]]
-    ys2 = [i[1] for i in points2[1][-1]]
+    xs1 = [i[0] for i in points1[1]]
+    ys1 = [i[1] for i in points1[1]]
+    points2 = using_grad_vector(golden, start, eps, func, grad)
+    xs2 = [i[0] for i in points2[1]]
+    ys2 = [i[1] for i in points2[1]]
 
     left = min(min(xs1), min(xs2))
     right = max(max(ys1), max(ys2))
@@ -32,14 +32,14 @@ def draw_function_graph(given_matrix, func, grad, lr=None, eps=None):
 
     x, y = np.meshgrid(x0, y0)
     plt.title(function_two_out(given_matrix))
-    plt.contour(x, y, func([x, y]), levels=sorted(set([func(i) for i in points1[1][-1]])))
+    plt.contour(x, y, func([x, y]), levels=sorted(set([func(i) for i in points1[1]])))
     plt.plot(xs1, ys1, 'o--')
     plt.plot(xs2, ys2, 'o--')
 
     print(points1[0])
-    print(points1[1][-1][-1], points1[2][-1][-1])
+    print(points1[1][-1], points1[2][-1])
     print(points2[0])
-    print(points2[1][-1][-1], points2[2][-1][-1])
+    print(points2[1][-1], points2[2][-1])
 
     plt.show()
 
@@ -47,29 +47,30 @@ def draw_function_graph(given_matrix, func, grad, lr=None, eps=None):
 def analyze_function(n, func, grad, vector=None):
     np.seterr(invalid='ignore')
     np.seterr(over='ignore')
-    eps = 10
+    eps = 10 ** (-4)
     lr = 0.001
 
     print('a')
 
     start = [1] * n
     learning_rate = gen_learning_rate(lr)
-    points1 = method_mas(learning_rate, start, 4, func, grad, eps)
+    points1 = using_grad_vector(learning_rate, start, eps, func, grad)
+
 
     print('---')
     print("Градиентный спуск")
     print('Функ: ' + str(points1[0]))
-    print('Итер: ' + str(len(points1[1][-1])))
-    print('Знач: ' + str(points1[2][-1][-1]))
+    print('Итер: ' + str(len(points1[1])))
+    print('Знач: ' + str(points1[2][-1]))
 
     start = vector
-    points2 = method_mas(golden, start, 4, func, grad, eps)
+    points2 = using_grad_vector(golden, start, eps, func, grad)
 
     print('---')
     print("Золотое сечение")
     print('Функ: ' + str(points2[0]))
-    print('Итер: ' + str(len(points2[1][-1])))
-    print('Знач: ' + str(points2[2][-1][-1]))
+    print('Итер: ' + str(len(points2[1])))
+    print('Знач: ' + str(points2[2][-1]))
 
     print('---------------')
     print('---------------')
