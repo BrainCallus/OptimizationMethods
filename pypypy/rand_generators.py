@@ -4,8 +4,8 @@ from random import randint
 from random import choice
 
 
-def generate_diagonal_1(k, n, given_vector=None):
-    gen_range = 1000 / k
+def generate_diagonal_1(n, k, given_vector=None):
+    gen_range = 10 * (len(str(k))) / k * 10
     if given_vector is None:
         given_vector = np.zeros((n,), dtype=float)
     min_gen = uniform(0, gen_range)
