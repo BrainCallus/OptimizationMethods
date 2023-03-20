@@ -1,60 +1,51 @@
 import math
 import numpy as np
 
-def grad(f,x):
-    delta = np.cbrt(np.finfo(float).eps)
+def line_search(x, p, f, grad):
+    nabl = grad(x)
+    alf = 1
+    c1 = 1e-4
+    c2 = 0.9
+    fx = f(x)
+    new_x = x + alf * p
+    new_nabl = grad(new_x)
+    func_calls = 2
+    while f(new_x) > fx + (c1 * alf * nabl.T @ p) \
+            or new_nabl.T @ p <= c2 * nabl.T @ p:
+        alf*=0.5
+        new_x = x + alf * p
+        new_nabl = grad(new_x)
+        func_calls += 1
+    return func_calls, alf
+
+def wolfe(x, eps, f, grad):
     dim = len(x)
-    nabl = np.zeros(dim)
-    for i in range(dim):
-        x_first = np.copy(x)
-        x_second = np.copy(x)
-        x_first[i] += delta
-        x_second[i] -= delta
-        nabl[i] = (f(x_first) - f(x_second))/(2*delta)
-    return nabl
-
-
-def line_search(x, p, f, nabl):
-  alf = 1
-  c1 = 1e-4
-  c2 = 0.9
-  fx = f(x)
-  new_x = x + alf * p
-  new_nabl = grad(f, new_x)
-  while f(new_x) > fx+(c1 * alf * nabl.T@p) or new_nabl.T@p<=c2*nabl.T@p:
-    alf*=0.5
-    new_x = x+alf*p
-    new_nabl = grad(f, new_x)
-  return alf
-
-def wolfe(x, eps, f):
-    dim = len(x)
-    steps_arg = [x]
-    steps_f = [f(x)]
-    H = np.eye(dim) ##approximate Hessian
-    i = 0
-    nabl = grad(f, x)
+    steps_x = [x]
+    steps_y = [f(x)]
+    H = np.eye(dim)
+    nabl = grad(x)
+    func_calls = 2
     while np.linalg.norm(nabl) > eps:
-        i += 1
-        p = -H@nabl
-        alf = line_search(x,p,f,nabl)
-        s = alf*p
-        new_nabl = grad(f,x+alf*p)
+        p = -H @ nabl
+        f_c, alf = line_search(x, p, f, grad)
+        new_nabl = grad(x + alf * p)
         y = new_nabl - nabl
         y = np.array([y], dtype='float64')
-        s = np.array([s], dtype='float64')
         y = np.reshape(y,(dim,1))
+        s = alf*p
+        s = np.array([s], dtype='float64')
         s = np.reshape(s,(dim,1))
-        r = 1/(y.T@s)
-        l_i = (np.eye(dim)-(r*((s@(y.T)))))
-        r_i = (np.eye(dim)-(r*((y@(s.T)))))
-        hess_inter = l_i@H@r_i
-        H = hess_inter + (r*((s@(s.T))))
+        r = 1 / (y.T @ s)
+        li = (np.eye(dim) - (r * (s @ y.T)))
+        ri = (np.eye(dim) - (r * (y @ s.T)))
+        hess_inter = li @ H @ ri
+        H = hess_inter + (r * (s @ s.T))
         nabl = new_nabl[:]
         x = x+alf*p
-        steps_arg.append(x)
-        steps_f.append(f(x))
-    return i, steps_arg, steps_f
+        func_calls += f_c + 1
+        steps_x.append(x)
+        steps_y.append(f(x))
+    return func_calls, steps_x, steps_y
 
 
 def gen_learning_rate(lr_step):
@@ -101,7 +92,7 @@ def using_grad_vector(method, x, eps, func, grad):
         steps_x.append(list(x))
         steps_y.append(func_value)
         func_value = func(x)
-        i += 1 + ii
+        i += 2 + ii
     return i, steps_x, steps_y
 
 
