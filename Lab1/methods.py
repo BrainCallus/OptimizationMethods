@@ -9,11 +9,13 @@ def line_search(x, p, f, grad):
     fx = f(x)
     new_x = x + alf * p
     new_nabl = grad(new_x)
+    f_new_x = f(new_x)
     func_calls = 2
-    while f(new_x) > fx + (c1 * alf * nabl.T @ p) \
-            or new_nabl.T @ p <= c2 * nabl.T @ p:
-        alf*=0.5
+    while f_new_x > fx + (c1 * alf * nabl.T @ p) \
+            or math.fabs(new_nabl.T @ p) > c2 * math.fabs(nabl.T @ p) and f_new_x != fx:
+        alf *= 0.5
         new_x = x + alf * p
+        f_new_x = f(new_x)
         new_nabl = grad(new_x)
         func_calls += 1
     return func_calls, alf
