@@ -3,12 +3,14 @@ from pypypy.methods import *
 from pypypy.out_functions import *
 from matplotlib import pyplot as plt
 from PIL import Image
+import pandas as pd
 
 def analyze_function(n, func, grad, given_vector=None, vector_using=None):
     if vector_using is None:
         vector_using = [True, True, True]
     np.seterr(invalid='ignore')
     np.seterr(over='ignore')
+    np.seterr(divide='ignore')
     alpha = 5
     start = [alpha] * n
     eps = 10 ** (-4)
@@ -97,27 +99,76 @@ def draw_function_graph(func, grad, given_matrix=None, given_vector=None):
 
 
 def multiple_tests_to_excel():
-    ii = [1, 2, 5, 10 , 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-    iter1 = iter2 = 0
-    for i in ii[0:2]:
-        iter1 += 1
-        for j in ii[1:3]:
-            iter2 += 1
+    file = './tables/multiple_results.xlsx'
+    sheet = 'Испытания'
 
+    ii = [1, 2, 5, 10, 50, 100, 150, 200, 250, 300, 350, 400, 450,
+          500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
+    jj = [2, 5, 10, 50, 100, 150, 200, 250, 300, 350, 400, 450,
+          500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
+    # jj = [2, 5, 10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+
+    frame = 2
+    pause = 2
+    methods = 1
+    times = 25
+
+    rows = frame + len(ii) + 100
+    cols = frame * methods + (methods-1) * pause + methods * len(jj) + 100
+
+    table = [['' for _ in range(rows)] for _ in range(cols)]
+
+    table[0][0] = 'learning_rate'
+    table[0][1] = 'n'
+    table[1][0] = 'k'
+
+    # table[frame + pause + len(jj)][0] = 'golden'
+    # table[frame + pause + len(jj)][1] = 'n'
+    # table[frame + pause + len(jj) + 1][0] = 'k'
+    #
+    # table[2 * frame + 2 * pause + 2 * len(jj)][0] = 'wolfe'
+    # table[2 * frame + 2 * pause + 2 * len(jj)][1] = 'n'
+    # table[2 * frame + 2 * pause + 2 * len(jj) + 1][0] = 'k'
+
+    it = -1
+    for j in jj:
+        it += 1
+        for k in range(methods):
+            table[it + frame * (k + 1) + pause * k + len(jj) * k][1] = j
+
+    it = -1
+    for i in ii:
+        it += 1
+        table[1][it + frame] = i
+
+
+    it = 0
+    iter1 = -1
+    for i in ii:
+        iter1 += 1
+        iter2 = -1
+        for j in jj:
             dimensions = i
             self_number = j
-            a = generate_diagonal_1(dimensions, self_number)
-            func = function_generator_vector(dimensions, a)
-            grad = gradient_generator_vector(dimensions, a)
-            points1, points2, points3 = \
-                analyze_function(dimensions, func, grad, vector_using=[True, True, False])
+            iter2 += 1
+            average = np.zeros(methods)
+            for k in range(times):
+                a, func, grad = generate_random_function_vector(dimensions, self_number)
+                points1, points2, points3 = \
+                    analyze_function(dimensions, func, grad, vector_using=[True, False, False])
+                average[0] += len(points1[1])
+                # average[1] += len(points2[1])
+                # average[2] += len(points3[1])
+            average[0] = average[0] / times
+            # average[1] = average[1] / times
+            # average[2] = average[2] / times
+            for k in range(methods):
+                table[iter2 + frame * (k + 1) + pause * k + len(jj) * k][iter1 + frame] = average[k]
+            it += 1
+            print(it)
 
-            print(dimensions)
-            print(self_number)
-            print(points1[0])
-            print(points2[0])
-
-            print("---")
+    df = pd.DataFrame(table)
+    df.to_excel(file, sheet_name=sheet)
 
 
 def scaling(number, method):
