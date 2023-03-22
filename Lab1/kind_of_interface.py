@@ -1,5 +1,3 @@
-import numpy as np
-
 from defs_grads import *
 from pypypy.methods import *
 from pypypy.out_functions import *
