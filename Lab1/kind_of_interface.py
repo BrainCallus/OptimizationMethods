@@ -1,6 +1,9 @@
+import numpy as np
+
 from defs_grads import *
 from pypypy.methods import *
 from pypypy.out_functions import *
+from analysed_funcs import *
 from matplotlib import pyplot as plt
 from PIL import Image
 import pandas as pd
@@ -105,7 +108,7 @@ def multiple_tests_to_excel():
     ii = [1, 2, 5, 10, 50, 100, 150, 200, 250, 300, 350, 400, 450,
           500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
     jj = [2, 5, 10, 50, 100, 150, 200, 250, 300, 350, 400, 450,
-          500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
+         500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
     # jj = [2, 5, 10, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
     frame = 2
@@ -166,93 +169,30 @@ def multiple_tests_to_excel():
                 table[iter2 + frame * (k + 1) + pause * k + len(jj) * k][iter1 + frame] = average[k]
             it += 1
             print(it)
+            print(average[0])
 
     df = pd.DataFrame(table)
     df.to_excel(file, sheet_name=sheet)
 
 
-def scaling(number, method):
+def functions_compare(func1, grad1, func2, grad2, method=1, func_name=None):
 
-    lr = gen_learning_rate(0.02)
+    vector_using = [False, False, False]
+    vector_using[method - 1] = True
+    method_name = method_names[method - 1]
 
-    if number == 1:
-        def f1(x):
-            return x[0] ** 2 + 13 * x[1] ** 2 + 3
-
-        def f11(x):
-            return x[0] ** 2 + x[1] ** 2 + 3
-
-        def grad1(x):
-          return np.asarray([2 * x[0], 26 * x[1]])
-
-        def grad11(x):
-          return np.asarray([2 * x[0], 26 * x[1] / math.sqrt(13)])
+    p1 = analyze_function(2, func1, grad1, vector_using=vector_using)
+    p2 = analyze_function(2, func2, grad2, vector_using=vector_using)
+    points1 = p1[method - 1]
+    points2 = p2[method - 1]
 
 
-        func1_name = '$x^2 + 13y^2 + 3$'
-
-        if method == 'golden':
-            scaling_functions(func1_name, golden, f1, f11, grad1, grad11)
-        else:
-            scaling_functions(func1_name, lr, f1, f11, grad1, grad11)
-
-
-    if number == 2:
-        def f2(x):
-            return 6 * x[0] ** 2 + 7 * x[1] ** 2 - 1
-
-        def grad2(x):
-          return np.asarray([12 * x[0], 14 * x[1]])
-
-        def f22(x):
-            return (x[0] ** 2) / 7 + (x[1] ** 2) / 6 - 1
-
-        def grad22(x):
-          return np.array([12 * x[0], 14 * x[1]]) / math.sqrt(7 * 6)
-
-        func2_name = '$6x^2 + 7y^2 - 1$'
-
-        if method == 'golden':
-            scaling_functions(func2_name, golden, f2, f22, grad2, grad22)
-
-        else:
-            scaling_functions(func2_name, lr, f2, f22, grad2, grad22)
-
-    if number == 3:
-        def f3(x):
-            return 5 * x[0] ** 2 + x[1] ** 2 - x[0] * x[1]
-
-        def grad3(x):
-            return np.asarray([10 * x[0] - x[1], 2 * x[1] - x[0]])
-
-        def f33(x):
-            return x[0] ** 2 * 2 + x[1] ** 2 / 4.5 * 2 - x[0] * x[1] / math.sqrt(4.5 / 4)
-
-        def grad33(x):
-            return np.asarray([10 * x[0] / math.sqrt(4.5 / 2) - x[1] * math.sqrt(2),
-                               2 * x[1]* math.sqrt(2) - x[0] / math.sqrt(4.5 / 2)])
-
-        func3_name = '$5x^2 + y^2 - xy$'
-
-        if method == 'golden':
-            scaling_functions(func3_name, golden, f3, f33, grad3, grad33)
-        else:
-            scaling_functions(func3_name, lr, f3, f33, grad3, grad33)
-
-
-def scaling_functions(func_name, method, func1, func2, grad1, grad2):
     np.seterr(invalid='ignore')
     np.seterr(over='ignore')
-    eps = 10 ** (-3)
 
-    alpha = 23
-    start = [alpha, -alpha]
-
-    points1 = using_grad_vector(method, start, eps, func1, grad1)
     xs1 = [i[0] for i in points1[1]]
     ys1 = [i[1] for i in points1[1]]
 
-    points2 = using_grad_vector(method, start, eps, func2, grad2)
     xs2 = [i[0] for i in points2[1]]
     ys2 = [i[1] for i in points2[1]]
 
@@ -261,22 +201,28 @@ def scaling_functions(func_name, method, func1, func2, grad1, grad2):
     up = max(max(ys1), max(ys2))
     bottom = min(min(ys1), min(ys2))
 
-    x0 = np.linspace(left - alpha / 10, right + alpha / 10, 1000)
-    y0 = np.linspace(bottom - alpha / 10, up + alpha / 10, 1000)
+    x0 = np.linspace(left - 1, right + 1, 1000)
+    y0 = np.linspace(bottom - 1, up + 1, 1000)
 
     x, y = np.meshgrid(x0, y0)
     plt.title(func_name)
-    plt.contour(x, y, func1([x, y]), levels=sorted(set([func1(i) for i in points1[1]])))
-    plt.contour(x, y, func2([x, y]), levels=sorted(set([func2(i) for i in points2[1]])))
-    plt.plot(xs1, ys1, 'o-')
-    plt.plot(xs2, ys2, 'o-')
-
-    print(points1[0])
-    print(points1[1][-1], points1[2][-1])
-    print(points2[0])
-    print(points2[1][-1], points2[2][-1])
+    ax = plt.subplot()
+    ax.contour(x, y, func1([x, y]), levels=sorted(set([func1(i) for i in points1[1]])))
+    ax.contour(x, y, func2([x, y]), levels=sorted(set([func2(i) for i in points2[1]])))
+    ax.plot(xs1, ys1, 'o-', label = method_name + ': ' + str(len(points1[1])))
+    ax.plot(xs2, ys2, 'o-', label = method_name + ': ' + str(len(points2[1])))
+    ax.legend(prop='monospace')
 
     plt.show()
+
+
+def scale_function(n, func, scaling_vector):
+    def scaled_func(vector):
+        result = [0 for _ in range(n)]
+        for i in range(n):
+            result[i] = vector[i] * scaling_vector[i]
+        return func(result)
+    return scaled_func
 
 
 def generate_random_function_vector(n, k):
@@ -296,6 +242,39 @@ def analyze_random_function(n, k):
     single_analyse_result(n, func, grad, a)
 
 
+def analyse_eps_parameter(func, grad):
+    start = [-15, 15]
+    lr = gen_learning_rate(0.06)
+
+    func_calls, p1, p2 = method_mas(lr, start, 9, func, grad)
+
+    print('---------------')
+    print('---------------')
+    print('---------------')
+    print('learning_rate')
+    for i in range(len(p1)):
+        # print('---')
+        # print('eps=1e-0' + str(i + 1))
+        # print('Функ: ' + str(func_calls[i]))
+        # print('Итер: ' + str(len(p1[i])))
+        # print('Рез : ' + str(p2[i][-1]))
+        print(str(func_calls[i]))
+
+    func_calls, p1, p2 = method_mas(golden, start, 9, func, grad)
+
+    print('---------------')
+    print('---------------')
+    print('---------------')
+    print('golden')
+    for i in range(len(p1)):
+        # print('---')
+        # print('eps=1e-0' + str(i + 1))
+        # print('Функ: ' + str(func_calls[i]))
+        # print('Итер: ' + str(len(p1[i])))
+        # print('Рез : ' + str(p2[i][-1]))
+        print(str(func_calls[i]))
+
+
 def graph_show_or_save(func, file_name=None, dir_name='graphs', save=True, show=False):
     if file_name is not None:
         file_name = './' + dir_name + '/' + file_name + '.jpg'
@@ -310,3 +289,5 @@ def graph_show_or_save(func, file_name=None, dir_name='graphs', save=True, show=
         Image.open(file_name).save(file_name, 'JPEG')
     if show:
         plt.show()
+
+
