@@ -1,11 +1,11 @@
 import math
-
 import numpy as np
 from learning_rates import learning_rate, const_learning_rate
+from regularization import NoRegularization, Regularization
 from abc import ABC, abstractmethod
 
 class Method(ABC):
-    def __init__(self, lr=None, eps=None):
+    def __init__(self, lr=None, eps=None, regularization=None):
         if lr is None or not (isinstance(lr, learning_rate)):
             self.lr = const_learning_rate(0.01)
         else:
@@ -14,6 +14,11 @@ class Method(ABC):
             self.eps = 0.001
         else:
             self.eps = eps
+        if regularization is None or not (isinstance(regularization, Regularization)):
+            self.regularization = NoRegularization()
+        else:
+            self.regularization = regularization
+
         self.start = None
 
     def set_lr(self, lr):
@@ -25,6 +30,12 @@ class Method(ABC):
     def set_eps(self, eps):
         self.eps = eps
 
+    def set_regularization(self, regularization):
+        if isinstance(regularization, Regularization):
+            self.regularization = regularization
+        else:
+            print("regularization should be Regularization class instance")
+
     def get_lr(self):
         return self.lr.get()
 
@@ -32,9 +43,8 @@ class Method(ABC):
     def calc_grad(f, x):
         return f.grad(x)
 
-    @staticmethod
-    def calc_func(f, x):
-        return f.func(x)
+    def calc_func(self, f, x):
+        return self.regularization.calc(f, x)
 
     @abstractmethod
     def set_params(self, grad, x):
@@ -70,8 +80,8 @@ class GD(Method):
         return x - self.lr.get() * np.asarray(self.calc_grad(f, x))
 
 class NAG(Method):
-    def __init__(self, gamma=0.5, lr=None, eps=None):
-        super().__init__(lr, eps)
+    def __init__(self, gamma=0.5, lr=None, eps=None, regularization=None):
+        super().__init__(lr, eps, regularization)
         self.gamma = gamma
         self.change = None
 
@@ -86,8 +96,8 @@ class NAG(Method):
         return self.change + self.gamma * (self.change - temp)
 
 class Momentum(Method):
-    def __init__(self, momentum=0.812, lr=None, eps=None):
-        super().__init__(lr, eps)
+    def __init__(self, momentum=0.812, lr=None, eps=None, regularization=None):
+        super().__init__(lr, eps, regularization)
         self.v = None
         self.momentum = momentum
 
@@ -101,8 +111,8 @@ class Momentum(Method):
         return x - self.lr.get() * self.v
 
 class AdaGrad(Method):
-    def __init__(self, lr=None, eps=None):
-        super().__init__(lr, eps)
+    def __init__(self, lr=None, eps=None, regularization=None):
+        super().__init__(lr, eps, regularization)
         self.non_zero_div = 0.0001
         self.B = None
 
@@ -117,8 +127,8 @@ class AdaGrad(Method):
         return x - (self.lr.get() / np.sqrt(self.B + self.non_zero_div)) * gr
 
 class RMSProp(AdaGrad):
-    def __init__(self, gamma = 0.9, lr=None, eps=None):
-        super().__init__(lr, eps)
+    def __init__(self, gamma = 0.9, lr=None, eps=None, regularization=None):
+        super().__init__(lr, eps, regularization)
         self.gamma = gamma
 
     def change_x(self, *args):
@@ -129,8 +139,8 @@ class RMSProp(AdaGrad):
         return x - (self.lr.get() / np.sqrt(self.B + self.non_zero_div)) * gr
 
 class Adam(AdaGrad):
-    def __init__(self, beta1=0.9, beta2=0.99, lr=None, eps=None):
-        super().__init__(lr, eps)
+    def __init__(self, beta1=0.9, beta2=0.99, lr=None, eps=None, regularization=None):
+        super().__init__(lr, eps, regularization)
         self.beta1 = beta1
         self.beta2 = beta2
         self.m =None
