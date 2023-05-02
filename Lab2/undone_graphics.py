@@ -39,3 +39,29 @@ def drawGraph(method, func, start=None):
     print(iterations)
     print(points[-1])
     plt.show()
+
+
+def draw_regression(data, vector_of_results, title=False):
+    if not title:
+        title = "$" + " + ".join([
+                    f"{vector_of_results[- i - 1]:.3f}" +
+                    " \cdot x ^ {" + str(i) + "}"
+                    for i in range(len(vector_of_results))]) + " $"
+    plt.title(title)
+
+    def result(x):
+        res = 0
+        for i in range(len(vector_of_results)):
+            res += vector_of_results[-i-1] * x ** i
+        return res
+
+    xs = [i[0] for i in data]
+    ys = [i[1] for i in data]
+    left, right  = min(xs), max(xs)
+    x0 = np.linspace(left - 1, right + 1, 100)
+    y0 = [result(i) for i in x0]
+
+    plt.plot(xs, ys, ".")
+    plt.plot(x0, y0, "-")
+
+    plt.show()

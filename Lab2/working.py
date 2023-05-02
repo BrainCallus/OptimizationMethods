@@ -47,7 +47,7 @@ method.set_regularization(reg)
 
 # пока только линейная: функцию ошибки не переписывала
 
-xs, ys = generate_descent_polynom(2, lambda a: 5 * a + 10, True)
+xs, ys = generate_descent_polynom(5, lambda a: 5 * a + 10, 2)
 xs = np.asarray(xs)
 ys = np.asarray(ys)
 xy = np.dstack((xs, ys))[0]
@@ -57,8 +57,9 @@ xy = np.dstack((xs, ys))[0]
 # MiniBatchGD  (func, grad, data, batch_size)
 
 error_function = BatchGD(error_func, error_func_grad, xy)
-
 iterations, dots = method.execute([100, 100], error_function)
+
+draw_regression(xy, dots[-1][0])
 
 print(len(xs))
 print(iterations)
@@ -66,19 +67,19 @@ print(dots[-1][0])
 
 
 
-# Блок 2. Депрессивно-строительный
-# грустные примитивные графики с 2 переменными
-
-func = lambda x: 5 * x[0] ** 2 + 6 * x[1] ** 2 + x[0]
-grad = lambda x: [10 * x[0] + 1, 13 * x[1]]
-function = Function(func, grad)
-output_LRate(method, function)
-
-
-# Блок 3. Моно-депрессивный
-# грустные примитивные графики с 1 переменной
-
-func = lambda x: 5 * x[0] ** 2 + x[0]
-grad = lambda x: [10 * x[0] + 1]
-function = Function(func, grad)
-drawGraph(method, function)
+# # Блок 2. Депрессивно-строительный
+# # грустные примитивные графики с 2 переменными
+#
+# func = lambda x: 5 * x[0] ** 2 + 6 * x[1] ** 2 + x[0]
+# grad = lambda x: [10 * x[0] + 1, 13 * x[1]]
+# function = Function(func, grad)
+# output_LRate(method, function)
+#
+#
+# # Блок 3. Моно-депрессивный
+# # грустные примитивные графики с 1 переменной
+#
+# func = lambda x: 5 * x[0] ** 2 + x[0]
+# grad = lambda x: [10 * x[0] + 1]
+# function = Function(func, grad)
+# drawGraph(method, function)
