@@ -44,7 +44,7 @@ def drawGraph(method, func, start=None):
 def draw_regression(data, vector_of_results, title=False):
     if not title:
         title = "$" + " + ".join([
-                    f"{vector_of_results[- i - 1]:.3f}" +
+                    f"{vector_of_results[i]:.3f}" +
                     " \cdot x ^ {" + str(i) + "}"
                     for i in range(len(vector_of_results))]) + " $"
     plt.title(title)
@@ -52,7 +52,7 @@ def draw_regression(data, vector_of_results, title=False):
     def result(x):
         res = 0
         for i in range(len(vector_of_results)):
-            res += vector_of_results[-i-1] * x ** i
+            res += vector_of_results[i] * x ** i
         return res
 
     xs = [i[0] for i in data]

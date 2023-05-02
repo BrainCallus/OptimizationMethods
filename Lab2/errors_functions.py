@@ -1,12 +1,16 @@
 import numpy as np
 
-def error(x, dot):
-    return x[0] * dot[0] + x[1] - dot[1]
 
-def error_func(x, data):
-    err = np.asarray([error(x, data[i]) for i in range(len(data))])
-    return np.sum(err ** 2)
+def quadratic_error(x, dot):
+    res = 0
+    for i in range(len(x)):
+        res += x[i] * dot[0] ** i
+    return res - dot[1]
 
-def error_func_grad(x, dot):
-    a = error(x, dot) * 2
-    return [a * dot[0], a]
+def quadratic_error_func(x, data):
+    err = np.asarray([quadratic_error(x, data[i]) for i in range(len(data))])
+    return np.sum(err ** 2) / len(data)
+
+def quadratic_error_func_grad(x, dot):
+    a = quadratic_error(x, dot) * 2
+    return [a * dot[0] ** i for i in range(len(x))]

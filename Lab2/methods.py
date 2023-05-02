@@ -68,6 +68,7 @@ class Method(ABC):
             steps.append(np.asarray([x_cur, f_cur], dtype='object'))
             self.lr.change(i)
             i = i + 1
+            # print("Func value: ", f_cur, ", iteration: ", i, ", delta: ", f_cur - f_prev)
         return i, np.asarray(steps, dtype='object')
 
 class GD(Method):

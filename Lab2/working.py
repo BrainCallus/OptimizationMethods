@@ -22,27 +22,15 @@ from regularization import *
 # L2Regularization (beta=0.08)
 # Elastic          (alpha=0.025, beta=0.08)
 
-reg = Elastic()
-
-lr = exp_learning_rate(0.01)
-gd       = GD      (lr=lr, regularization=reg)
-momentum = Momentum(lr=lr, regularization=reg)
-nag      = NAG     (lr=lr, regularization=reg)
-
-lr = exp_learning_rate(100)
-ada_grad = AdaGrad (lr=lr, regularization=reg)
-
-lr = exp_learning_rate(10)
-rms_prop = RMSProp (lr=lr, regularization=reg)
-adam     = Adam    (lr=lr, regularization=reg)
-
 # другие методы объявлены, можно использовать и их
 
 # Блок 1. Стохастический-ебанистический
 
 # пока только линейная: функцию ошибки не переписывала
 
-xs, ys = generate_descent_polynom(100, lambda a: 5 * a + 10, 5)
+start = [100, 100, 100]
+xs, ys = generate_descent_polynom(15, lambda x: 3 * x**2 + 6 * x + 100, 50, 150)
+
 xs = np.asarray(xs)
 ys = np.asarray(ys)
 xy = np.dstack((xs, ys))[0]
@@ -51,24 +39,40 @@ xy = np.dstack((xs, ys))[0]
 # BatchGD      (func, grad, data)
 # MiniBatchGD  (func, grad, data, batch_size)
 
-method = momentum
+# method = rms_prop
+#
+# error_function = BatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
+# iterations, dots = method.execute(start, error_function)
+# draw_regression(xy, dots[-1][0])
+#
+# print(len(xs))
+# print(iterations)
+# print(dots[-1])
 
-error_function = BatchGD(error_func, error_func_grad, xy)
-iterations, dots = method.execute([100, 100], error_function)
-draw_regression(xy, dots[-1][0])
+reg = NoRegularization()
+
+lr = exp_learning_rate(0.01)
+gd       = GD      (lr=lr, regularization=reg)
+momentum = Momentum(lr=lr, regularization=reg)
+nag      = NAG     (lr=lr, regularization=reg, gamma=0.12)
+
+lr = exp_learning_rate(100)
+ada_grad = AdaGrad (lr=lr, regularization=reg)
+
+lr = exp_learning_rate(10)
+rms_prop = RMSProp (lr=lr, regularization=reg)
+adam     = Adam    (lr=lr, regularization=reg)
+
+method = nag
 
 print(len(xs))
-print(iterations)
-print(dots[-1][0])
 
-method = ada_grad
-
-error_function = BatchGD(error_func, error_func_grad, xy)
-iterations, dots = method.execute([100, 100], error_function)
+error_function = BatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
+iterations, dots = method.execute(start, error_function)
 draw_regression(xy, dots[-1][0])
 
 print(iterations)
-print(dots[-1][0])
+print(dots[-1])
 
 
 # # Блок 2. Депрессивно-строительный
