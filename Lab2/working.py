@@ -7,6 +7,7 @@ from regression_generation import *
 from regularization import *
 
 
+
 # Можно потыкать разные learning rate:
 # const : initial_rate
 # time  : initial_rate / (decay * (iter + 1))
