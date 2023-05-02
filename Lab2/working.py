@@ -36,6 +36,7 @@ lr = exp_learning_rate(10)
 rms_prop = RMSProp (lr=lr, regularization=reg)
 adam     = Adam    (lr=lr, regularization=reg)
 
+
 # другие методы объявлены, можно использовать и их
 
 
