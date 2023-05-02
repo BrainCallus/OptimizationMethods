@@ -25,20 +25,17 @@ from regularization import *
 reg = Elastic()
 
 lr = exp_learning_rate(0.01)
-gd       = GD      (lr=lr)
-momentum = Momentum(lr=lr)
-nag      = NAG     (lr=lr)
+gd       = GD      (lr=lr, regularization=reg)
+momentum = Momentum(lr=lr, regularization=reg)
+nag      = NAG     (lr=lr, regularization=reg)
 
 lr = exp_learning_rate(100)
-ada_grad = AdaGrad (lr=lr)
+ada_grad = AdaGrad (lr=lr, regularization=reg)
 
 lr = exp_learning_rate(10)
-rms_prop = RMSProp (lr=lr)
-adam     = Adam    (lr=lr)
+rms_prop = RMSProp (lr=lr, regularization=reg)
+adam     = Adam    (lr=lr, regularization=reg)
 
-
-method = rms_prop
-method.set_regularization(reg)
 
 # другие методы объявлены, можно использовать и их
 
@@ -47,7 +44,7 @@ method.set_regularization(reg)
 
 # пока только линейная: функцию ошибки не переписывала
 
-xs, ys = generate_descent_polynom(5, lambda a: 5 * a + 10, 2)
+xs, ys = generate_descent_polynom(100, lambda a: 5 * a + 10, 5)
 xs = np.asarray(xs)
 ys = np.asarray(ys)
 xy = np.dstack((xs, ys))[0]
@@ -56,15 +53,24 @@ xy = np.dstack((xs, ys))[0]
 # BatchGD      (func, grad, data)
 # MiniBatchGD  (func, grad, data, batch_size)
 
+method = momentum
+
 error_function = BatchGD(error_func, error_func_grad, xy)
 iterations, dots = method.execute([100, 100], error_function)
-
 draw_regression(xy, dots[-1][0])
 
 print(len(xs))
 print(iterations)
 print(dots[-1][0])
 
+method = ada_grad
+
+error_function = BatchGD(error_func, error_func_grad, xy)
+iterations, dots = method.execute([100, 100], error_function)
+draw_regression(xy, dots[-1][0])
+
+print(iterations)
+print(dots[-1][0])
 
 
 # # Блок 2. Депрессивно-строительный
