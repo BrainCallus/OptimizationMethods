@@ -11,9 +11,7 @@ def execute(method, func, start, dim):
 
 
 def output_LRate(method, func, start=None):
-
     iterations, points = execute(method, func, start, 2)
-
 
     xs = [i[0][0] for i in points]
     ys = [i[0][1] for i in points]
@@ -23,17 +21,16 @@ def output_LRate(method, func, start=None):
     print(points[-1])
     plt.show()
 
-def drawGraph(method, func, start=None):
 
+def drawGraph(method, func, start=None):
     iterations, points = execute(method, func, start, 1)
 
     xs = [i[0][0] for i in points]
     ys = [i[1] for i in points]
 
-    left, right  = min(xs), max(xs)
+    left, right = min(xs), max(xs)
     x0 = np.linspace(left - 1, right + 1, 100)
     y0 = [func.func([i]) for i in x0]
-
 
     plt.plot(x0, y0, '-')
     plt.plot(xs, ys, '.-', color='red')
@@ -42,8 +39,7 @@ def drawGraph(method, func, start=None):
     plt.show()
 
 
-def draw_regression(method, function, start, data, title=False):
-
+def draw_regression(method, function, start, data, init_coefs, title=False):
     iter, points = method.execute(start, function)
     xs = [i[0] for i in points[:, 0]]
     ys = [i[1] for i in points[:, 0]]
@@ -51,10 +47,14 @@ def draw_regression(method, function, start, data, title=False):
     vector_of_results = points[-1][0]
 
     if not title:
-        title = "$" + " + ".join([
-                    f"{vector_of_results[i]:.3f}" +
-                    " \cdot x ^ {" + str(i) + "}"
-                    for i in range(len(vector_of_results))]) + " $"
+
+        title = "$ Initial: " + " + ".join([
+            f"{init_coefs[i]:.3f}" +
+            " \cdot x ^ {" + str(i) + "}"
+            for i in range(len(init_coefs))]) + "  $\n $ Computed: " + " + ".join([
+            f"{vector_of_results[i]:.3f}" +
+            " \cdot x ^ {" + str(i) + "}"
+            for i in range(len(vector_of_results))]) + " $"
     plt.title(title)
 
     def result(x):
@@ -65,7 +65,7 @@ def draw_regression(method, function, start, data, title=False):
 
     x = [i[0] for i in data]
     y = [i[1] for i in data]
-    left, right  = min(x), max(x)
+    left, right = min(x), max(x)
     x0 = np.linspace(left - 1, right + 1, 100)
     y0 = [result(i) for i in x0]
 
@@ -75,6 +75,7 @@ def draw_regression(method, function, start, data, title=False):
     ax.legend(prop='monospace')
 
     plt.show()
+
 
 def draw_levels(function, start, *args):
     b = -110

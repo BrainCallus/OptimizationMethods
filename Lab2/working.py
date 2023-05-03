@@ -32,7 +32,9 @@ adam     = Adam    (lr=lr, regularization=reg)
 
 
 start = [100, 100, 100]
-xs, ys = generate_descent_polynom(10, lambda x: 6 * x ** 2 + 5 * x + 10, 10, 50)
+func_coefs = [10, 5, 7]
+# хочется задавать вектор коэффициэнтов произвольной длины и автоматом подставлять его в лямду
+xs, ys = generate_descent_polynom(10, lambda x: func_coefs[2] * x ** 2 + func_coefs[1] * x + func_coefs[0], 10, 50)
 xs = np.asarray(xs)
 ys = np.asarray(ys)
 xy = np.dstack((xs, ys))[0]
@@ -42,10 +44,10 @@ xy = np.dstack((xs, ys))[0]
 error_function = BatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
 
 
-for method in [nag]:
+for method in [adam, nag,ada_grad, momentum, rms_prop]:
     iterations, dots = method.execute(start, error_function)
 
-    draw_regression(method, error_function, start, xy)
+    draw_regression(method, error_function, start, xy, func_coefs)
 
     print(len(xs))
     print(iterations)
