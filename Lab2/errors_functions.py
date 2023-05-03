@@ -1,5 +1,3 @@
-import numpy as np
-
 def error(x, dot):
     res = 0
     for i in range(len(x)):
