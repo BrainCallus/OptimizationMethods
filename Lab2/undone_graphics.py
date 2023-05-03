@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def execute(method, func, start, dim):
@@ -64,4 +65,28 @@ def draw_regression(data, vector_of_results, title=False):
     plt.plot(xs, ys, ".")
     plt.plot(x0, y0, "-")
 
+    plt.show()
+
+def draw_levels(function, start, *args):
+    b = -110
+    a = 110
+    numb = 300
+    x = np.linspace(b, a, numb)
+    y = np.linspace(b, a, numb)
+    X, Y = np.meshgrid(x, y)
+    Z = function.func([X, Y])
+
+    ax = plt.subplot()
+
+    contour = plt.contour(X, Y, Z)
+    plt.clabel(contour, inline=True, fontsize=9)
+
+    for i in args:
+        iter, points = i.execute(start, function)
+        xs = [i[0] for i in points[:, 0]]
+        ys = [i[1] for i in points[:, 0]]
+        ax.plot(xs, ys, '.-', label=i.name + " : " + str(iter) + " : " + f"{points[-1][1]:.2}")
+        ax.legend(prop='monospace')
+
+    plt.colorbar()
     plt.show()

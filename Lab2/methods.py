@@ -72,6 +72,7 @@ class Method(ABC):
         return i, np.asarray(steps, dtype='object')
 
 class GD(Method):
+    name = "GD"
     def set_params(self, grad, x):
         pass
 
@@ -81,6 +82,7 @@ class GD(Method):
         return x - self.lr.get() * np.asarray(self.calc_grad(f, x))
 
 class NAG(Method):
+    name = "Nesterov"
     def __init__(self, gamma=0.5, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.gamma = gamma
@@ -97,6 +99,7 @@ class NAG(Method):
         return self.change + self.gamma * (self.change - temp)
 
 class Momentum(Method):
+    name = "Momentum"
     def __init__(self, momentum=0.812, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.v = None
@@ -112,6 +115,7 @@ class Momentum(Method):
         return x - self.lr.get() * self.v
 
 class AdaGrad(Method):
+    name = "AdaGrad"
     def __init__(self, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.non_zero_div = 0.0001
@@ -128,6 +132,7 @@ class AdaGrad(Method):
         return x - (self.lr.get() / np.sqrt(self.B + self.non_zero_div)) * gr
 
 class RMSProp(AdaGrad):
+    name = "RMSProp"
     def __init__(self, gamma = 0.9, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.gamma = gamma
@@ -140,6 +145,7 @@ class RMSProp(AdaGrad):
         return x - (self.lr.get() / np.sqrt(self.B + self.non_zero_div)) * gr
 
 class Adam(AdaGrad):
+    name = "Adam"
     def __init__(self, beta1=0.9, beta2=0.99, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.beta1 = beta1
