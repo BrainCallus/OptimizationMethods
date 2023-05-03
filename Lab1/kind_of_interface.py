@@ -1,6 +1,6 @@
 from defs_grads import *
-from pypypy.methods import *
-from pypypy.out_functions import *
+from methods import *
+from out_functions import *
 from analysed_funcs import *
 from matplotlib import pyplot as plt
 from PIL import Image

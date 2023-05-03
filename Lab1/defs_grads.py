@@ -1,4 +1,4 @@
-from pypypy.rand_generators import *
+from rand_generators import *
 
 def function_generator(n, given_matrix, given_vector=None, given_monom=0):
     flag = False if given_vector is None else True

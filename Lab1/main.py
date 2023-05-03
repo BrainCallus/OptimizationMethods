@@ -1,5 +1,4 @@
 from kind_of_interface import *
-import math
 
 
 def main():
