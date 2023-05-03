@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from polynom_function import *
 import numpy as np
 
 class Function:
@@ -11,6 +12,12 @@ class Function:
 
     def grad(self, x):
         return self.gradient(x)
+
+class PolynomFunction(Function):
+    def __init__(self, vector):
+        function, gradient = polynom(vector)
+        super().__init__(function, gradient)
+
 
 class FunctionWithData(Function, ABC):
     def __init__(self, function, gradient, data):
