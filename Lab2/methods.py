@@ -41,7 +41,7 @@ class Method(ABC):
 
     @staticmethod
     def calc_grad(f, x):
-        return f.grad(x)
+        return np.asarray(f.grad(x))
 
     def calc_func(self, f, x):
         return self.regularization.calc(f, x)
@@ -57,7 +57,7 @@ class Method(ABC):
     def execute(self, start, f):
         i = 2
         x_cur = np.asarray(start)
-        x_prev = x_cur - self.lr.get()
+        x_prev = x_cur - self.get_lr()
         f_cur, f_prev = self.calc_func(f, x_cur), self.calc_func(f, x_prev)
         steps = [[x_prev, f_prev], [x_cur, f_cur]]
         self.set_params(f, x_prev)
@@ -79,40 +79,42 @@ class GD(Method):
     def change_x(self, *args):
         f = args[0]
         x = args[1]
-        return x - self.lr.get() * np.asarray(self.calc_grad(f, x))
+        return x - self.get_lr() * self.calc_grad(f, x)
 
 class NAG(Method):
     name = "Nesterov"
-    def __init__(self, gamma=0.5, lr=None, eps=None, regularization=None):
+    def __init__(self, gamma=0.6, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.gamma = gamma
         self.change = None
 
     def set_params(self, f, x):
-        self.change = x - self.lr.get() * np.asarray(self.calc_grad(f, x))
+        self.change = - self.get_lr() * self.calc_grad(f, x)
 
     def change_x(self, *args):
         f = args[0]
         x = args[1]
-        temp = self.change
-        self.change = x - self.lr.get() * np.asarray(self.calc_grad(f, x))
-        return self.change + self.gamma * (self.change - temp)
+        self.change = self.gamma * self.change + \
+                      self.get_lr() * self.calc_grad(f, x - self.change)
+        return x - self.change
+        # self.change = x - self.get_lr() * self.calc_grad(f, x)
+        # return self.change + self.gamma * (self.change - temp)
 
 class Momentum(Method):
     name = "Momentum"
-    def __init__(self, momentum=0.812, lr=None, eps=None, regularization=None):
+    def __init__(self, momentum=0.612, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.v = None
         self.momentum = momentum
 
     def set_params(self, f, x):
-        self.v = - self.lr.get() * np.asarray(self.calc_grad(f, x))
+        self.v = - self.get_lr() * self.calc_grad(f, x)
 
     def change_x(self, *args):
         f = args[0]
         x = args[1]
-        self.v = self.momentum * self.v + np.asarray(self.calc_grad(f, x))
-        return x - self.lr.get() * self.v
+        self.v = self.momentum * self.v - self.get_lr() * self.calc_grad(f, x)
+        return x + self.v
 
 class AdaGrad(Method):
     name = "AdaGrad"
@@ -127,9 +129,9 @@ class AdaGrad(Method):
     def change_x(self, *args):
         f = args[0]
         x = args[1]
-        gr = np.asarray(self.calc_grad(f, x))
+        gr = self.calc_grad(f, x)
         self.B += gr ** 2
-        return x - (self.lr.get() / np.sqrt(self.B + self.non_zero_div)) * gr
+        return x - (self.get_lr() / np.sqrt(self.B + self.non_zero_div)) * gr
 
 class RMSProp(AdaGrad):
     name = "RMSProp"
@@ -140,9 +142,9 @@ class RMSProp(AdaGrad):
     def change_x(self, *args):
         f = args[0]
         x = args[1]
-        gr = np.asarray(self.calc_grad(f, x))
+        gr = self.calc_grad(f, x)
         self.B = self.B * self.gamma + (1 - self.gamma) * (gr ** 2)
-        return x - (self.lr.get() / np.sqrt(self.B + self.non_zero_div)) * gr
+        return x - (self.get_lr() / np.sqrt(self.B + self.non_zero_div)) * gr
 
 class Adam(AdaGrad):
     name = "Adam"
@@ -162,10 +164,10 @@ class Adam(AdaGrad):
         f = args[0]
         x = args[1]
         i = args[2]
-        gr = np.asarray(self.calc_grad(f, x))
+        gr = self.calc_grad(f, x)
         self.m = self.m * self.beta1 + (1 - self.beta1) * gr
         self.v = self.v * self.beta2 + (1 - self.beta2) * gr ** 2
         mm = self.m / (1 - self.beta1 ** i)
         vv = self.v / (1 - self.beta2 ** i)
-        return x - (self.lr.get() / np.sqrt(vv) + self.non_zero_div) * mm
+        return x - (self.get_lr() / np.sqrt(vv) + self.non_zero_div) * mm
 

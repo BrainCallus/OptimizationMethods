@@ -42,7 +42,14 @@ def drawGraph(method, func, start=None):
     plt.show()
 
 
-def draw_regression(data, vector_of_results, title=False):
+def draw_regression(method, function, start, data, title=False):
+
+    iter, points = method.execute(start, function)
+    xs = [i[0] for i in points[:, 0]]
+    ys = [i[1] for i in points[:, 0]]
+
+    vector_of_results = points[-1][0]
+
     if not title:
         title = "$" + " + ".join([
                     f"{vector_of_results[i]:.3f}" +
@@ -56,14 +63,16 @@ def draw_regression(data, vector_of_results, title=False):
             res += vector_of_results[i] * x ** i
         return res
 
-    xs = [i[0] for i in data]
-    ys = [i[1] for i in data]
-    left, right  = min(xs), max(xs)
+    x = [i[0] for i in data]
+    y = [i[1] for i in data]
+    left, right  = min(x), max(x)
     x0 = np.linspace(left - 1, right + 1, 100)
     y0 = [result(i) for i in x0]
 
-    plt.plot(xs, ys, ".")
-    plt.plot(x0, y0, "-")
+    ax = plt.subplot()
+    ax.plot(x, y, ".")
+    ax.plot(x0, y0, "-", label=method.name + " : " + str(iter) + " : " + f"{points[-1][1]:.2}")
+    ax.legend(prop='monospace')
 
     plt.show()
 
