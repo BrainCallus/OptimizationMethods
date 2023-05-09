@@ -3,15 +3,22 @@ from polynom_function import *
 import numpy as np
 
 class Function:
-    def __init__(self, function, gradient):
+    def __init__(self, function, gradient, title=None):
         self.function = function
         self.gradient = gradient
+        self.title = title
 
     def func(self, x):
         return self.function(x)
 
     def grad(self, x):
         return self.gradient(x)
+
+    def set_title(self, title):
+        self.title = title
+
+    def get_title(self):
+        return self.title
 
 class FunctionWithData(Function, ABC):
     def __init__(self, function, gradient, data):
