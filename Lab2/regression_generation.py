@@ -9,9 +9,10 @@ def generate_descent_polynom(dev, func, dens=10, dots_number=None, draw=False, t
         dots_number = dens * k
     x = np.linspace(-k, k, dots_number)
     y = [func(i) + np.random.uniform(-dev, dev) for i in x]
+    y_real = [func(i) for i in x]
 
     if draw:
         plt.title((title if title else "") + " $deviation = $" + str(dev))
         plt.plot(x, y, ".", label="")
         plt.show()
-    return x, y
+    return x, y, y_real
