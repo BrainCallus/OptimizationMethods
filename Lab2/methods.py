@@ -4,6 +4,7 @@ from learning_rates import learning_rate, const_learning_rate
 from regularization import NoRegularization, Regularization
 from abc import ABC, abstractmethod
 
+
 class Method(ABC):
     def __init__(self, lr=None, eps=None, regularization=None):
         if lr is None or not (isinstance(lr, learning_rate)):
@@ -39,6 +40,9 @@ class Method(ABC):
     def get_lr(self):
         return self.lr.get()
 
+    def get_lrName(self):
+        return self.lr.__class__.__name__
+
     @staticmethod
     def calc_grad(f, x):
         return np.asarray(f.grad(x))
@@ -71,8 +75,10 @@ class Method(ABC):
             # print("Func value: ", f_cur, ", iteration: ", i, ", delta: ", f_cur - f_prev)
         return i, np.asarray(steps, dtype='object')
 
+
 class GD(Method):
     name = "GD"
+
     def set_params(self, grad, x):
         pass
 
@@ -81,8 +87,10 @@ class GD(Method):
         x = args[1]
         return x - self.get_lr() * self.calc_grad(f, x)
 
+
 class NAG(Method):
     name = "Nesterov"
+
     def __init__(self, gamma=0.6, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.gamma = gamma
@@ -100,8 +108,10 @@ class NAG(Method):
         # self.change = x - self.get_lr() * self.calc_grad(f, x)
         # return self.change + self.gamma * (self.change - temp)
 
+
 class Momentum(Method):
     name = "Momentum"
+
     def __init__(self, momentum=0.612, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.v = None
@@ -116,8 +126,10 @@ class Momentum(Method):
         self.v = self.momentum * self.v - self.get_lr() * self.calc_grad(f, x)
         return x + self.v
 
+
 class AdaGrad(Method):
     name = "AdaGrad"
+
     def __init__(self, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.non_zero_div = 0.0001
@@ -133,9 +145,11 @@ class AdaGrad(Method):
         self.B += gr ** 2
         return x - (self.get_lr() / np.sqrt(self.B + self.non_zero_div)) * gr
 
+
 class RMSProp(AdaGrad):
     name = "RMSProp"
-    def __init__(self, gamma = 0.9, lr=None, eps=None, regularization=None):
+
+    def __init__(self, gamma=0.9, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.gamma = gamma
 
@@ -146,13 +160,15 @@ class RMSProp(AdaGrad):
         self.B = self.B * self.gamma + (1 - self.gamma) * (gr ** 2)
         return x - (self.get_lr() / np.sqrt(self.B + self.non_zero_div)) * gr
 
+
 class Adam(AdaGrad):
     name = "Adam"
+
     def __init__(self, beta1=0.9, beta2=0.99, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
         self.beta1 = beta1
         self.beta2 = beta2
-        self.m =None
+        self.m = None
         self.v = None
 
     def set_params(self, grad, x):
@@ -169,5 +185,4 @@ class Adam(AdaGrad):
         self.v = self.v * self.beta2 + (1 - self.beta2) * gr ** 2
         mm = self.m / (1 - self.beta1 ** i)
         vv = self.v / (1 - self.beta2 ** i)
-        return x - (self.get_lr() / np.sqrt(vv) + self.non_zero_div) * mm
-
+        return x - (self.get_lr() / np.sqrt(vv + self.non_zero_div)) * mm

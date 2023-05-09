@@ -1,3 +1,5 @@
+import profile
+
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -47,7 +49,6 @@ def draw_regression(method, function, start, data, init_coefs, title=False):
     vector_of_results = points[-1][0]
 
     if not title:
-
         title = "$ Initial: " + " + ".join([
             f"{init_coefs[i]:.3f}" +
             " \cdot x ^ {" + str(i) + "}"
@@ -77,7 +78,7 @@ def draw_regression(method, function, start, data, init_coefs, title=False):
     plt.show()
 
 
-def draw_levels(function, start, *args):
+def draw_levels(function, start, funcToStr, *args):
     b = -110
     a = 110
     numb = 300
@@ -97,6 +98,10 @@ def draw_levels(function, start, *args):
         ys = [i[1] for i in points[:, 0]]
         ax.plot(xs, ys, '.-', label=i.name + " : " + str(iter) + " : " + f"{points[-1][1]:.2}")
         ax.legend(prop='monospace')
+
+        print(i.name + ";" + str(iter) + ";" + str(iter * 2 + 2) + ";"
+              + str(i.get_lrName()) + ";" + str(i.get_lr()) + ";" + str(start) + ";" + str(
+            points[-1][1]) + ";" + funcToStr)
 
     plt.colorbar()
     plt.show()
