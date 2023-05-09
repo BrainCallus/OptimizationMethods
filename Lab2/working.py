@@ -33,6 +33,7 @@ start = [10, 10, 10]
 func_coefs = [100, 5, 7]
 # хочется задавать вектор коэффициэнтов произвольной длины и автоматом подставлять его в лямду
 xs, ys = generate_descent_polynom(10, lambda x: func_coefs[2] * x ** 2 + func_coefs[1] * x + func_coefs[0], 10, 50)
+xs, ys = generate_descent_polynom(10, polynom(func_coefs), 10, 50)
 xs = np.asarray(xs)
 ys = np.asarray(ys)
 xy = np.dstack((xs, ys))[0]
