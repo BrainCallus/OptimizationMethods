@@ -49,13 +49,7 @@ def draw_regression(method, function, start, data, data_real, init_coefs, title=
     vector_of_results = points[-1][0]
 
     if not title:
-        title = "$ Initial: " + " + ".join([
-            f"{init_coefs[i]:.3f}" +
-            " \cdot x ^ {" + str(i) + "}"
-            for i in range(len(init_coefs))]) + "  $\n $ Computed: " + " + ".join([
-            f"{vector_of_results[i]:.3f}" +
-            " \cdot x ^ {" + str(i) + "}"
-            for i in range(len(vector_of_results))]) + " $"
+        title = method.name+": "+str(iter)
     plt.title(title)
 
     def result(x):
@@ -69,14 +63,24 @@ def draw_regression(method, function, start, data, data_real, init_coefs, title=
     xr = [i[0] for i in data_real]
     yr = [i[1] for i in data_real]
     left, right = min(x), max(x)
-    x0 = np.linspace(left - 1, right + 1, 100)
+    x0 = np.linspace(left - 0.1, right + 0.1, 100)
     y0 = [result(i) for i in x0]
 
     ax = plt.subplot()
+    t="$ Computed: " + " + ".join([
+            f"{vector_of_results[i]:.3f}" +
+            " \cdot x ^ {" + str(i) + "}"
+            for i in range(len(vector_of_results))]) + " $"
+    init="$ Initial: " + " + ".join([
+            f"{init_coefs[i]:.3f}" +
+            " \cdot x ^ {" + str(i) + "}"
+            for i in range(len(init_coefs))])+"$"
     ax.plot(x, y, ".")
-    ax.plot(xr, yr,"-")
-    ax.plot(x0, y0, "-", label=method.name + " : " + str(iter) + " : " + f"{points[-1][1]:.2}")
+    ax.plot(xr, yr,"-",label=init)
+    ax.plot(x0, y0, "-", label=t)
     ax.legend(prop='monospace')
+    print(init_coefs,";",vector_of_results)
+
 
 
 

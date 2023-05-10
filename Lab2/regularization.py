@@ -12,7 +12,7 @@ class NoRegularization(Regularization):
         return f.func(x)
 
 class L1Regularization(Regularization):
-    def __init__(self, alpha = 0.025):
+    def __init__(self, alpha = 0.05):
         self.alpha = alpha
 
     def calc(self, f, x):
@@ -26,7 +26,7 @@ class L2Regularization(Regularization):
         return f.func(x) + self.beta * np.sqrt(np.sum(x ** 2))
 
 class Elastic(Regularization):
-    def __init__(self, alpha = 0.025, beta = 0.08):
+    def __init__(self, alpha = 0.075, beta = 0.08):
         self.alpha = alpha
         self.beta = beta
 

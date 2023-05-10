@@ -14,7 +14,7 @@ lr = exp_learning_rate(0.05)
 lr.decay = 1
 gd = GD(lr=lr, regularization=reg)
 
-lr = const_learning_rate(0.002)
+lr = exp_learning_rate(0.2)
 momentum = Momentum(lr=lr, regularization=reg)
 
 lr = time_learning_rate(0.001)
@@ -28,11 +28,11 @@ ada_grad = AdaGrad(lr=lr, regularization=reg)
 lr = exp_learning_rate(50)
 rms_prop = RMSProp(lr=lr, regularization=reg)
 
-lr = exp_learning_rate(85)
+lr = exp_learning_rate(95)#35 55
 adam = Adam(lr=lr, regularization=reg)
 
-start = [0, 0, 0,0,0]
-func_coefs = [10, 5, 7,3,9]
+start = [0, 0, 0]
+func_coefs = [8,-23,-13]
 xs, ys, y_real = generate_descent_polynom(10, polynom(func_coefs), 10, 50)
 xs = np.asarray(xs)
 ys = np.asarray(ys)
@@ -43,12 +43,12 @@ xy_real  = np.dstack((xs,y_real))[0]
 
 error_function = BatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
 
-for method in [adam,momentum,ada_grad, rms_prop,nag]:
+for method in [adam]:
     iterations, dots = method.execute(start, error_function)
 
     draw_regression(method, error_function, start, xy, xy_real, func_coefs)
 
-    print(len(xs))
-    print(iterations)
-    print(dots[-1])
+    #print(len(xs))
+    #print(iterations)
+    #print(dots[-1])
     print("---")
