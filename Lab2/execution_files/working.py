@@ -31,7 +31,7 @@ lr = exp_learning_rate(95)#35 55
 adam = Adam(lr=lr, regularization=reg)
 
 start = [0, 0, 0]
-func_coefs = [8,-23,-13]
+func_coefs = [8, -23, -13]
 xs, ys, y_real = generate_descent_polynom(15, polynom(func_coefs), 50)
 xy = np.dstack((xs, ys))[0]
 xy_real  = np.dstack((xs,y_real))[0]
