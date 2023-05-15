@@ -1,9 +1,9 @@
 import numpy as np
 
-from OptimizationMethods.Lab2.documentation.errors_functions import quadratic_error_func, quadratic_error_func_grad
-from OptimizationMethods.Lab2.documentation.functions_and_gradients import MiniBatchGD
-from OptimizationMethods.Lab2.documentation.polynom_function import polynom
-from OptimizationMethods.Lab2.execute_documetation.regression_generation import generate_descent_polynom
+from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
+from OptimizationMethods.Lab2.lib.functions_and_gradients import MiniBatchGD
+from OptimizationMethods.Lab2.lib.polynom_function import polynom
+from OptimizationMethods.Lab2.execute_lib.regression_generation import generate_descent_polynom
 
 
 def batch_size_test(method, start, finish,  data_size):

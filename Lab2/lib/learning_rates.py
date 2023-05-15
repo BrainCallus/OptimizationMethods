@@ -6,7 +6,7 @@ class learning_rate(ABC):
         self.value = numb
         self.initial_rate = numb
         self.decay = 0.05
-        self.min_value = 0.0001
+        self.min_value = 0.001
 
     def get(self):
         return self.value

@@ -1,8 +1,8 @@
-from OptimizationMethods.Lab2.documentation.methods import *
-from OptimizationMethods.Lab2.documentation.learning_rates import *
-from OptimizationMethods.Lab2.documentation.functions_and_gradients import *
-from OptimizationMethods.Lab2.execute_documetation.graphics import *
-from OptimizationMethods.Lab2.documentation.regularization import *
+from OptimizationMethods.Lab2.lib.methods import *
+from OptimizationMethods.Lab2.lib.learning_rates import *
+from OptimizationMethods.Lab2.lib.functions_and_gradients import *
+from OptimizationMethods.Lab2.execute_lib.graphics import *
+from OptimizationMethods.Lab2.lib.regularization import *
 
 reg = NoRegularization()
 
@@ -20,7 +20,6 @@ ada_grad = AdaGrad(lr=lr, regularization=reg)
 
 lr = const_learning_rate(5)
 rms_prop = RMSProp(lr=lr, regularization=reg)
-
 lr = exp_learning_rate(85)
 adam = Adam(lr=lr, regularization=reg)
 

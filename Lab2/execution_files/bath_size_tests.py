@@ -1,13 +1,16 @@
-from OptimizationMethods.Lab2.documentation.methods import *
-from OptimizationMethods.Lab2.documentation.learning_rates import *
-from OptimizationMethods.Lab2.execute_documetation.graphics import *
-from OptimizationMethods.Lab2.execute_documetation.tests import *
-from OptimizationMethods.Lab2.documentation.regularization import *
+from OptimizationMethods.Lab2.lib.methods import *
+from OptimizationMethods.Lab2.lib.learning_rates import *
+from OptimizationMethods.Lab2.execute_lib.graphics import *
+from OptimizationMethods.Lab2.execute_lib.tests import *
+from OptimizationMethods.Lab2.lib.regularization import *
 
-reg = Elastic()
-lr = const_learning_rate(0.01)
+reg = NoRegularization()
+lr = exp_learning_rate(0.07)
 method = NAG(lr=lr, regularization=reg)
 
-res = batch_size_test(method, 10, 50, 50)
-show_results(res, title="Зависимость количества итераций от размера батча",
-             xy_names=["Размер батча", "Количество итераций"])
+n_points = 100
+
+res = batch_size_test(method, 10, 70, n_points)
+show_results(res, title="Dependence of the number of iterations on the batch size",
+             xy_names=["Number of iterations", "Batch size"],
+             plot_comment = method.name + " : " + str(n_points) + " points")

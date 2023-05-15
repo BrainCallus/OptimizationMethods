@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from OptimizationMethods.Lab2.execute_documetation.help_functions import *
+from OptimizationMethods.Lab2.execute_lib.help_functions import *
 
 
 def draw_regression(method, function, start, data, data_real, init_coefs, title=False):
@@ -47,7 +47,7 @@ def draw_regression(method, function, start, data, data_real, init_coefs, title=
     plt.show()
 
 
-def draw_levels(function, start, *args):
+def draw_levels(function, start, *args, frame=10):
 
     ax = plt.subplot()
     plt.title(function.get_title())
@@ -76,7 +76,6 @@ def draw_levels(function, start, *args):
 
 
     numb = 300
-    frame = 10
 
     min_x, max_x = center(min_dots, max_dots, min_x, max_x)
     min_y, max_y = center(min_dots, max_dots, min_y, max_y)
