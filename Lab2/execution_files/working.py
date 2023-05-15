@@ -32,12 +32,12 @@ adam = Adam(lr=lr, regularization=reg)
 
 start = [0, 0, 0]
 func_coefs = [8,-23,-13]
-xs, ys, y_real = generate_descent_polynom(20, polynom(func_coefs), 100)
+xs, ys, y_real = generate_descent_polynom(15, polynom(func_coefs), 50)
 xy = np.dstack((xs, ys))[0]
 xy_real  = np.dstack((xs,y_real))[0]
 # method = momentum
 
-error_function = BatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
+error_function = MiniBatchGD(quadratic_error_func, quadratic_error_func_grad, xy, 20)
 
 for method in [rms_prop]:
     iterations, dots = method.execute(start, error_function)

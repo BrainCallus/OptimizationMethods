@@ -44,7 +44,7 @@ class BatchGD(FunctionWithData):
 class MiniBatchGD(FunctionWithData):
     def __init__(self, function, gradient, data, batch_size=250):
         super().__init__(function, gradient, data)
-        self.batch = batch_size
+        self.batch = min(len(data), batch_size)
 
     def set_batch(self, batch_size):
         self.batch = batch_size
