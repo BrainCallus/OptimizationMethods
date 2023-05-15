@@ -11,7 +11,7 @@ class learning_rate(ABC):
     def get(self):
         return self.value
 
-    def set_new(self, new_value):
+    def set_value(self, new_value):
         self.value = new_value
 
     @abstractmethod
