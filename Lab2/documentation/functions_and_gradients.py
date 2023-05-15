@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 class Function:
-    def __init__(self, function, gradient, title=None):
+    def __init__(self, function, gradient, title=""):
         self.function = function
         self.gradient = gradient
         self.title = title
