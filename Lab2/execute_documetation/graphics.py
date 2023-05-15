@@ -1,44 +1,7 @@
-import profile
-
 import numpy as np
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
-
-def execute(method, func, start, dim):
-    if start is None:
-        start = np.full(dim, 100)
-
-    return method.execute(start, func)
-
-
-def output_LRate(method, func, start=None):
-    iterations, points = execute(method, func, start, 2)
-
-    xs = [i[0][0] for i in points]
-    ys = [i[0][1] for i in points]
-
-    plt.plot(xs, ys, 'o-')
-    print(iterations)
-    print(points[-1])
-    plt.show()
-
-
-def drawGraph(method, func, start=None):
-    iterations, points = execute(method, func, start, 1)
-
-    xs = [i[0][0] for i in points]
-    ys = [i[1] for i in points]
-
-    left, right = min(xs), max(xs)
-    x0 = np.linspace(left - 1, right + 1, 100)
-    y0 = [func.func([i]) for i in x0]
-
-    plt.plot(x0, y0, '-')
-    plt.plot(xs, ys, '.-', color='red')
-    print(iterations)
-    print(points[-1])
-    plt.show()
+from OptimizationMethods.Lab2.execute_documetation.help_functions import *
 
 
 def draw_regression(method, function, start, data, data_real, init_coefs, title=False):
@@ -67,50 +30,80 @@ def draw_regression(method, function, start, data, data_real, init_coefs, title=
     y0 = [result(i) for i in x0]
 
     ax = plt.subplot()
-    t="$ Computed: " + " + ".join([
+    comp = "$ Computed: " + " + ".join([
             f"{vector_of_results[i]:.3f}" +
             " \cdot x ^ {" + str(i) + "}"
             for i in range(len(vector_of_results))]) + " $"
-    init="$ Initial: " + " + ".join([
+    init = "$ Initial: " + " + ".join([
             f"{init_coefs[i]:.3f}" +
             " \cdot x ^ {" + str(i) + "}"
             for i in range(len(init_coefs))])+"$"
     ax.plot(x, y, ".")
     ax.plot(xr, yr,"-",label=init)
-    ax.plot(x0, y0, "-", label=t)
+    ax.plot(x0, y0, "-", label=comp)
     ax.legend(prop='monospace')
     print(init_coefs,";",vector_of_results)
-
-
-
 
     plt.show()
 
 
-def draw_levels(function, start, funcToStr, *args):
-    b = -110
-    a = 110
-    numb = 300
-    x = np.linspace(b, a, numb)
-    y = np.linspace(b, a, numb)
-    X, Y = np.meshgrid(x, y)
-    Z = function.func([X, Y])
+def draw_levels(function, start, *args):
 
     ax = plt.subplot()
-
-    contour = plt.contour(X, Y, Z)
-    plt.clabel(contour, inline=True, fontsize=9)
+    plt.title(function.get_title())
+    min_dots, max_dots = np.math.inf, - np.math.inf
+    min_x, max_x = np.math.inf, - np.math.inf
+    min_y, max_y = np.math.inf, - np.math.inf
 
     for i in args:
         iter, points = i.execute(start, function)
         xs = [i[0] for i in points[:, 0]]
         ys = [i[1] for i in points[:, 0]]
+
+        min_x = min(min_x, min(xs))
+        max_x = max(max_x, max(xs))
+        min_y = min(min_y, min(ys))
+        max_y = max(max_y, max(ys))
+        min_dots = min([min_dots, min_x, min_y])
+        max_dots = max([max_dots, max_x, max_y])
+
         ax.plot(xs, ys, '.-', label=i.name + " : " + str(iter) + " : " + f"{points[-1][1]:.2}")
         ax.legend(prop='monospace')
 
         print(i.name + ";" + str(iter) + ";" + str(iter * 2 + 2) + ";"
               + str(i.get_lrName()) + ";" + str(i.get_lr()) + ";" + str(start) + ";" + str(
-            points[-1][1]) + ";" + funcToStr)
+            points[-1][1]) + ";" + function.get_title())
 
+
+    numb = 300
+    frame = 10
+
+    min_x, max_x = center(min_dots, max_dots, min_x, max_x)
+    min_y, max_y = center(min_dots, max_dots, min_y, max_y)
+    x = np.linspace(min_x - frame, max_x + frame, numb)
+    y = np.linspace(min_y - frame, max_y + frame, numb)
+    X, Y = np.meshgrid(x, y)
+    Z = function.func([X, Y])
+    contour = plt.contour(X, Y, Z)
+    plt.clabel(contour, inline=True, fontsize=9)
     plt.colorbar()
+    plt.show()
+
+
+def show_results(res, title=None, xy_names=None, plot_comment=None, plot_style="-"):
+    xs = np.asarray([i[0] for i in res])
+    ys = np.asarray([i[1] for i in res])
+
+    ax = plt.subplot()
+    plot, = ax.plot(xs, ys, linestyle=plot_style)
+
+    if plot_comment is not None:
+        plot.set_label(plot_comment)
+        ax.legend(prop='monospace')
+    if title is not None:
+        plt.title(title)
+    if xy_names is not None:
+        plt.xlabel(xy_names[0])
+        plt.ylabel(xy_names[1])
+
     plt.show()

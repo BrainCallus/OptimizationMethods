@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from polynom_function import *
 import numpy as np
 
 class Function:
@@ -47,8 +46,11 @@ class MiniBatchGD(FunctionWithData):
         super().__init__(function, gradient, data)
         self.batch = batch_size
 
+    def set_batch(self, batch_size):
+        self.batch = batch_size
+
     def grad(self, x):
-        # np.random.shuffle(self.data)
-        # return np.sum([grad(x, self.data[i]) for i in range(self.batch)], axis = 0) / self.batch
-        return np.sum([self.gradient(x, self.data[np.random.randint(self.data_size)]) for _ in range(self.batch)],
-                      axis=0) / self.batch
+        np.random.shuffle(self.data)
+        return np.sum([self.gradient(x, self.data[i]) for i in range(self.batch)], axis = 0) / self.batch
+        # return np.sum([self.gradient(x, self.data[np.random.randint(self.data_size)]) for _ in range(self.batch)],
+        #               axis=0) / self.batch
