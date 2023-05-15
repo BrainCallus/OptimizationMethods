@@ -89,7 +89,7 @@ def draw_levels(function, start, *args, frame=10):
     plt.show()
 
 
-def show_results(res, title=None, xy_names=None, plot_comment=None, plot_style="-"):
+def show_tests_graph(res, title=None, xy_names=None, plot_comment=None, plot_style="-"):
     xs = np.asarray([i[0] for i in res])
     ys = np.asarray([i[1] for i in res])
 
