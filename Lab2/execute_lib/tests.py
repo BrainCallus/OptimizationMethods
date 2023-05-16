@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
@@ -11,6 +13,26 @@ def do_several_tests(test_func, n, *args):
         res.append(test_func(*args))
     return np.mean(np.asarray(res), axis=0)
 
+def do_several_tests_with_consts(test_func, n, *args):
+    res = []
+    if n == 0: return None
+    names = []
+    for i in range(n):
+        press = test_func(*args)
+        names = [i[0] for i in press]
+        value = [i[1] for i in press]
+        res.append(value)
+    names = np.asarray(names, dtype='object')
+    return np.dstack((names, np.mean(np.asarray(res), axis=0)))[0]
+
+def time_test(function, start, *methods):
+    res = []
+    for method in methods:
+        time_start = time.time_ns() / 10 ** 6
+        method.execute(start, function)
+        time_finish = time.time_ns() / 10 ** 6
+        res.append([method.name, time_finish - time_start])
+    return res
 
 def batch_size_test(method, start, finish, data_size):
     start_point = [0, 0]
