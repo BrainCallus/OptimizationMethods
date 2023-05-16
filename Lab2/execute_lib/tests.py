@@ -25,6 +25,14 @@ def do_several_tests_with_consts(test_func, n, *args):
     names = np.asarray(names, dtype='object')
     return np.dstack((names, np.mean(np.asarray(res), axis=0)))[0]
 
+
+def arithmetics_test(function, start, *methods):
+    res = []
+    for method in methods:
+        iter, points = method.execute(start, function)
+        res.append([method.name, iter * method.math_operations])
+    return res
+
 def time_test(function, start, *methods):
     res = []
     for method in methods:
