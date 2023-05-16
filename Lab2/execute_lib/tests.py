@@ -14,8 +14,9 @@ def do_several_tests(test_func, n, *args):
     return np.mean(np.asarray(res), axis=0)
 
 def do_several_tests_with_consts(test_func, n, *args):
-    res = []
     if n == 0: return None
+
+    res = []
     names = []
     for i in range(n):
         press = test_func(*args)
@@ -43,6 +44,8 @@ def time_test(function, start, *methods):
     return res
 
 def batch_size_test(method, start, finish, data_size):
+    if start >= finish or finish >= data_size : return None
+
     start_point = [0, 0]
     xs, ys, y_real = generate_descent_polynom(15, polynom([np.random.uniform(0, 10), np.random.uniform(0, 10)]),
                                               data_size)
