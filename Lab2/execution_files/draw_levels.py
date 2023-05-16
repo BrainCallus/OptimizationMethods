@@ -26,6 +26,6 @@ adam = Adam(lr=lr, regularization=reg)
 start = [-40, 45]
 func = lambda x: x[0] ** 2 + 9 * x[1] ** 2
 grad = lambda x: [2 * x[0], 18 * x[1]]
-function = Function(func, grad, title="$x^2 + 9y^2$")
+function = Function(func, grad, title="$x^2 + 9y^2 + 5$")
 
 draw_levels(function, start, gd, momentum, nag, rms_prop, adam, ada_grad)

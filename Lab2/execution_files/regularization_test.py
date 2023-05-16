@@ -1,4 +1,3 @@
-from OptimizationMethods.Lab2.execute_lib.excel import *
 from OptimizationMethods.Lab2.execute_lib.tests import *
 from OptimizationMethods.Lab2.execute_lib.graphics import *
 from OptimizationMethods.Lab2.lib.functions_and_gradients import *
@@ -33,13 +32,13 @@ func = lambda x: x[0] ** 2 + 9 * x[1] ** 2 + 5
 grad = lambda x: [2 * x[0], 18 * x[1]]
 function = Function(func, grad, title="$x^2 + 9y^2 + 5$")
 
-test_count = 30
-res = do_several_tests_with_consts(time_test, test_count, function, start, gd, momentum, nag, ada_grad, rms_prop, adam)
+method = gd
 
-test_name = "time_methods"
-make_excel_table(res, "./../tables/" + test_name + ".xlsx")
+res = regularization_test(function, start, method)
+
 
 show_tests_graph(res, plot_type="hist",
-                 title="Working time of different methods",
-                 xy_names=["Method", "milliseconds"],
-                 plot_comment="average of " + str(test_count) + " tests")
+                 title="Different regularization return",
+                 xy_names=["Regularization type", "Result"],
+                 plot_comment=method.name + " : " + function.get_title(),
+                 plot_style='hist')

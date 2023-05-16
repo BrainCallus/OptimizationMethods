@@ -6,6 +6,8 @@ from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, 
 from OptimizationMethods.Lab2.lib.functions_and_gradients import MiniBatchGD
 from OptimizationMethods.Lab2.lib.polynom_function import polynom
 from OptimizationMethods.Lab2.execute_lib.regression_generation import generate_descent_polynom
+from OptimizationMethods.Lab2.lib.regularization import *
+
 
 def do_several_tests(test_func, n, *args):
     res = []
@@ -26,6 +28,18 @@ def do_several_tests_with_consts(test_func, n, *args):
     names = np.asarray(names, dtype='object')
     return np.dstack((names, np.mean(np.asarray(res), axis=0)))[0]
 
+
+def regularization_test(function, start, method):
+    res = []
+    regs = ['NoRegularization', 'L1', 'L2', 'Elastic']
+    rs = [NoRegularization(), L1Regularization(), L2Regularization(), Elastic()]
+
+    for i in range(4):
+        method.set_regularization(rs[0])
+        _, result = method.execute(start, function)
+        res.append([regs[i], result[-1][1]])
+
+    return res
 
 def arithmetics_test(function, start, *methods):
     res = []
@@ -59,5 +73,4 @@ def batch_size_test(method, start, finish, data_size):
         func.set_batch(i)
         iterations, _ = method.execute(start_point, func)
         res.append([i, iterations])
-
     return res

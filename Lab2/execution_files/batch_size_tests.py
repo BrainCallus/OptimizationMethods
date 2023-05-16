@@ -11,8 +11,8 @@ method = RMSProp(lr=lr, regularization=reg)
 
 
 start = 1
-finish = start + 4
-n_points = 300
+finish = start + 30
+n_points = 50
 tests_count = 1
 
 res = do_several_tests(batch_size_test, tests_count, method, start, finish, n_points)
