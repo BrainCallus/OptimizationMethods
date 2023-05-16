@@ -89,12 +89,12 @@ def draw_levels(function, start, *args, frame=10):
     plt.show()
 
 
-def show_tests_graph(res, title=None, xy_names=None, plot_comment=None, plot_style="-"):
+def show_tests_graph(res, title=None, xy_names=None, plot_comment=None, plot_style="-", color="tab:blue"):
     xs = np.asarray([i[0] for i in res])
     ys = np.asarray([i[1] for i in res])
 
     ax = plt.subplot()
-    plot, = ax.plot(xs, ys, linestyle=plot_style)
+    plot, = ax.plot(xs, ys, plot_style, color=color)
 
     if plot_comment is not None:
         plot.set_label(plot_comment)
