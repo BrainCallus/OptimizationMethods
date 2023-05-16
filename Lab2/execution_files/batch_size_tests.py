@@ -10,10 +10,8 @@ lr = exp_learning_rate(0.2)
 method = RMSProp(lr=lr, regularization=reg)
 
 
-# старт и финиш считаются с 0 до n включительно
-
-start = 250
-finish = start + 1
+start = 1
+finish = start + 4
 n_points = 300
 tests_count = 1
 

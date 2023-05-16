@@ -53,9 +53,8 @@ def batch_size_test(method, start, finish, data_size):
     func = MiniBatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
 
     for i in range(start, finish):
-        j = i + 1
-        func.set_batch(j)
+        func.set_batch(i)
         iterations, _ = method.execute(start_point, func)
-        res.append([j, iterations])
+        res.append([i, iterations])
 
     return res
