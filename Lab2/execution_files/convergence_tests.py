@@ -21,7 +21,7 @@ momentum = Momentum(lr=lr, regularization=reg)
 lr = exp_learning_rate(0.01)
 nag = NAG(lr=lr, regularization=reg)
 
-lr = step_learning_rate(10, 4)
+lr = step_learning_rate(70, 20)
 ada_grad = AdaGrad(lr=lr, regularization=reg)
 
 lr = const_learning_rate(0.1)
@@ -36,9 +36,9 @@ func = lambda x: x[0] ** 2 + 9 * x[1] ** 2 + 5
 grad = lambda x: [2 * x[0], 18 * x[1]]
 function = Function(func, grad, title="$x^2 + 9y^2 + 5$")
 
-method = gd
-cut = 100
-cut2 = 100
+method = ada_grad
+cut = 0
+cut2 = 0
 
 iterations, points = method.execute(start, function)
 

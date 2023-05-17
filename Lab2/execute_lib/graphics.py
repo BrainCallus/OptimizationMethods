@@ -103,6 +103,9 @@ def show_tests_graph(res,
 
     if plot_type == "hist":
         plot = ax.bar(xs, ys, width=0.5, color=color)
+        for rect in plot:
+            a = rect.get_height()
+            plt.text(rect.get_x() + rect.get_width() / 2.0, a, f"{a:.3f}", ha='center', va='bottom')
     else:
         plot, = ax.plot(xs, ys, plot_style, color=color)
 

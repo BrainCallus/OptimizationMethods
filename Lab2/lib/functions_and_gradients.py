@@ -1,3 +1,4 @@
+from random import randint
 from abc import ABC, abstractmethod
 import numpy as np
 
@@ -49,8 +50,9 @@ class MiniBatchGD(FunctionWithData):
     def set_batch(self, batch_size):
         self.batch = batch_size
 
+
     def grad(self, x):
-        np.random.shuffle(self.data)
-        return np.sum([self.gradient(x, self.data[i]) for i in range(self.batch)], axis = 0) / self.batch
-        # return np.sum([self.gradient(x, self.data[np.random.randint(self.data_size)]) for _ in range(self.batch)],
-        #               axis=0) / self.batch
+        # np.random.shuffle(self.data)
+        # return np.sum([self.gradient(x, self.data[i]) for i in range(self.batch)], axis = 0) / self.batch
+        a = randint(0, self.data_size - self.batch)
+        return np.sum([self.gradient(x, self.data[i]) for i in range(a, a + self.batch)], axis = 0) / self.batch
