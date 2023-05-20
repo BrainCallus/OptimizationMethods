@@ -11,33 +11,36 @@ class learning_rate(ABC):
     def get(self):
         return self.value
 
-    def set_new(self, new_value):
+    def set_value(self, new_value):
         self.value = new_value
 
-    @abstractmethod
     def change(self, *args):
+        if self.value > self.min_value:
+            self.self_change(*args)
+        elif self.value < self.value:
+            self.value = self.min_value
+
+    @abstractmethod
+    def self_change(self, *args):
         pass
 
 class const_learning_rate(learning_rate):
-    def change(self, *args):
+    def self_change(self, *args):
         pass
 
 class time_learning_rate(learning_rate):
-    def change(self, *args):
+    def self_change(self, *args):
         self.value = self.initial_rate / (self.decay * (args[0] + 1))
-        self.value = max(self.value, self.min_value)
 
 class step_learning_rate(learning_rate):
     def __init__(self, numb, epoch):
         super().__init__(numb)
         self.epoch = epoch
 
-    def change(self, *args):
+    def self_change(self, *args):
         self.value = self.initial_rate * \
                      math.pow(self.decay, math.floor((1 + args[0]) / self.epoch))
-        self.value = max(self.value, self.min_value)
 
 class exp_learning_rate(learning_rate):
-    def change(self, *args):
+    def self_change(self, *args):
         self.value = self.initial_rate * math.exp(- self.decay * args[0])
-        self.value = max(self.value, self.min_value)

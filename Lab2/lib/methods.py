@@ -1,7 +1,7 @@
 import math
 import numpy as np
-from learning_rates import learning_rate, const_learning_rate
-from regularization import NoRegularization, Regularization
+from OptimizationMethods.Lab2.lib.learning_rates import learning_rate, const_learning_rate
+from OptimizationMethods.Lab2.lib.regularization import NoRegularization, Regularization
 from abc import ABC, abstractmethod
 
 
@@ -58,6 +58,16 @@ class Method(ABC):
     def change_x(self, *args):
         pass
 
+    @property
+    @abstractmethod
+    def math_operations(self):
+        """
+        :return:
+        количество математических операций
+        при подсчёте изменения x
+        """
+        pass
+
     def execute(self, start, f):
         i = 2
         x_cur = np.asarray(start)
@@ -78,6 +88,7 @@ class Method(ABC):
 
 class GD(Method):
     name = "GD"
+    math_operations = 2
 
     def set_params(self, grad, x):
         pass
@@ -90,6 +101,7 @@ class GD(Method):
 
 class NAG(Method):
     name = "Nesterov"
+    math_operations = 5
 
     def __init__(self, gamma=0.6, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
@@ -98,6 +110,7 @@ class NAG(Method):
 
     def set_params(self, f, x):
         self.change = - self.get_lr() * self.calc_grad(f, x)
+
 
     def change_x(self, *args):
         f = args[0]
@@ -111,6 +124,7 @@ class NAG(Method):
 
 class Momentum(Method):
     name = "Momentum"
+    math_operations = 4
 
     def __init__(self, momentum=0.612, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
@@ -129,6 +143,7 @@ class Momentum(Method):
 
 class AdaGrad(Method):
     name = "AdaGrad"
+    math_operations = 7
 
     def __init__(self, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
@@ -148,6 +163,7 @@ class AdaGrad(Method):
 
 class RMSProp(AdaGrad):
     name = "RMSProp"
+    math_operations = 9
 
     def __init__(self, gamma=0.9, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)
@@ -163,6 +179,7 @@ class RMSProp(AdaGrad):
 
 class Adam(AdaGrad):
     name = "Adam"
+    math_operations = 16
 
     def __init__(self, beta1=0.9, beta2=0.99, lr=None, eps=None, regularization=None):
         super().__init__(lr, eps, regularization)

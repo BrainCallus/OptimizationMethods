@@ -1,7 +1,7 @@
 def error(x, dot):
     res = 0
     for i in range(len(x)):
-        res += x[i] * dot[0] ** i
+        res += x[i] * (dot[0] ** i)
     return res - dot[1]
 
 def quadratic_error_func(x, data):

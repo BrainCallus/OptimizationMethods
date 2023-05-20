@@ -1,9 +1,9 @@
+from random import randint
 from abc import ABC, abstractmethod
-from polynom_function import *
 import numpy as np
 
 class Function:
-    def __init__(self, function, gradient, title=None):
+    def __init__(self, function, gradient, title=""):
         self.function = function
         self.gradient = gradient
         self.title = title
@@ -45,10 +45,14 @@ class BatchGD(FunctionWithData):
 class MiniBatchGD(FunctionWithData):
     def __init__(self, function, gradient, data, batch_size=250):
         super().__init__(function, gradient, data)
+        self.batch = min(len(data), batch_size)
+
+    def set_batch(self, batch_size):
         self.batch = batch_size
+
 
     def grad(self, x):
         # np.random.shuffle(self.data)
-        # return np.sum([grad(x, self.data[i]) for i in range(self.batch)], axis = 0) / self.batch
-        return np.sum([self.gradient(x, self.data[np.random.randint(self.data_size)]) for _ in range(self.batch)],
-                      axis=0) / self.batch
+        # return np.sum([self.gradient(x, self.data[i]) for i in range(self.batch)], axis = 0) / self.batch
+        a = randint(0, self.data_size - self.batch)
+        return np.sum([self.gradient(x, self.data[i]) for i in range(a, a + self.batch)], axis = 0) / self.batch

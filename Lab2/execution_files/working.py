@@ -1,12 +1,11 @@
-import numpy as np
-
-from methods import *
-from learning_rates import *
-from functions_and_gradients import *
-from undone_graphics import *
-from errors_functions import *
-from regression_generation import *
-from regularization import *
+from OptimizationMethods.Lab2.lib.methods import *
+from OptimizationMethods.Lab2.lib.learning_rates import *
+from OptimizationMethods.Lab2.lib.functions_and_gradients import *
+from OptimizationMethods.Lab2.lib.polynom_function import polynom
+from OptimizationMethods.Lab2.execute_lib.graphics import *
+from OptimizationMethods.Lab2.lib.errors_functions import *
+from OptimizationMethods.Lab2.execute_lib.regression_generation import *
+from OptimizationMethods.Lab2.lib.regularization import *
 
 reg = Elastic()
 
@@ -32,18 +31,15 @@ lr = exp_learning_rate(95)#35 55
 adam = Adam(lr=lr, regularization=reg)
 
 start = [0, 0, 0]
-func_coefs = [8,-23,-13]
-xs, ys, y_real = generate_descent_polynom(10, polynom(func_coefs), 10, 50)
-xs = np.asarray(xs)
-ys = np.asarray(ys)
-y_real = np.asarray(y_real)
+func_coefs = [8, -23, -13]
+xs, ys, y_real = generate_descent_polynom(15, polynom(func_coefs), 50)
 xy = np.dstack((xs, ys))[0]
 xy_real  = np.dstack((xs,y_real))[0]
 # method = momentum
 
-error_function = BatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
+error_function = MiniBatchGD(quadratic_error_func, quadratic_error_func_grad, xy, 20)
 
-for method in [adam]:
+for method in [rms_prop]:
     iterations, dots = method.execute(start, error_function)
 
     draw_regression(method, error_function, start, xy, xy_real, func_coefs)
