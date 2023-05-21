@@ -85,6 +85,23 @@ class Method(ABC):
             # print("Func value: ", f_cur, ", iteration: ", i, ", delta: ", f_cur - f_prev)
         return i, np.asarray(steps, dtype='object')
 
+    def simple_execute(self, start, f):
+        i = 2
+        x_cur = np.asarray(start)
+        x_prev = x_cur - self.get_lr()
+        f_cur, f_prev = self.calc_func(f, x_cur), self.calc_func(f, x_prev)
+        steps = [x_prev, f_prev]
+        self.set_params(f, x_prev)
+        while math.fabs(f_cur - f_prev) > self.eps:
+            x_cur = self.change_x(f, x_cur, i)
+            f_prev = f_cur
+            f_cur = self.calc_func(f, x_cur)
+            steps = np.asarray([x_cur, f_cur], dtype='object')
+            self.lr.change(i)
+            i = i + 1
+            # print("Func value: ", f_cur, ", iteration: ", i, ", delta: ", f_cur - f_prev)
+        return i, steps
+
 
 class GD(Method):
     name = "GD"

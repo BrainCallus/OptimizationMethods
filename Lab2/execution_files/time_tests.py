@@ -51,8 +51,8 @@ names = ['NoRegularization', 'L1', 'L2', 'Elastic']
 res = do_several_tests_with_consts(time_test, test_count, function, names, method1, method2, method3, method4)
 
 show_tests_graph(res, plot_type="hist",
-                 title="Working time of different methods",
-                 xy_names=["Method", "milliseconds"],
+                 title="Working time of different regularization",
+                 xy_names=["Regularization", "milliseconds"],
                  plot_comment="average of " + str(test_count) + " tests")
 
 test_name = "time_methods"
