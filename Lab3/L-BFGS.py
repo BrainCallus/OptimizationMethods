@@ -24,7 +24,11 @@ def line_search(x, p, f, grad):
     return alf
 
 
-# тут мы, в отличие от обычного bfgs не храним матрицу, а сохраняем в очередь нужные k значений параметров
+""""
+    тут мы, в отличие от обычного bfgs не храним матрицу, а сохраняем в очередь нужные k значений параметров
+"""
+
+
 def BFGS(x, eps, f, grad, queue_sz):
     steps_arg = [x]
     steps_f = [f(x)]
@@ -66,15 +70,15 @@ def BFGS(x, eps, f, grad, queue_sz):
             rhoList.pop()
             alphaList.pop()
             # тут типа из очереди удаляем последний элемент для sList, yList, rhpList, alphaList
-        alf = line_search(x, -r, f, grad)
+        alf = line_search(x, -r, f, nabl)
         xPrev = x
         x = x - r * alf
-        grad = grad(x)
+        nabl = grad(x)
         sList.insert(0, x - xPrev)
-        yList.insert(0, grad - gradPrev)
+        yList.insert(0, nabl - gradPrev)
         rhoList.insert(0, 1.0 / (np.dot(yList[0], sList[0]) + eps * 10 ** (-3)))
         alphaList.insert(0, alf)
-        gradPrev = grad
+        gradPrev = nabl
         steps_arg.append(x)
         steps_f.append(f(x))
         i += 1
