@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.ticker import LinearLocator
 
 from OptimizationMethods.Lab2.execute_lib.help_functions import *
 
@@ -117,5 +118,23 @@ def show_tests_graph(res,
     if xy_names is not None:
         plt.xlabel(xy_names[0])
         plt.ylabel(xy_names[1])
+
+    plt.show()
+
+def show_3d_plot(res, title=None, plot_comment =None):
+
+    @np.vectorize
+    def make_z(i, j):
+        return res[i][j]
+
+    res = np.asarray(res)
+    x = np.arange(0, len(res))
+    y = np.arange(0, len(res[0]))
+    xs, ys = np.meshgrid(x, y)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_zlim(-0.01, 1.01)
+    ax.plot_surface(xs, ys, make_z(xs, ys))
 
     plt.show()

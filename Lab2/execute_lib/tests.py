@@ -1,7 +1,5 @@
 import time
 
-import numpy as np
-
 from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
 from OptimizationMethods.Lab2.lib.functions_and_gradients import *
 from OptimizationMethods.Lab2.lib.polynom_function import polynom
@@ -12,7 +10,11 @@ from OptimizationMethods.Lab2.lib.regularization import *
 def do_several_tests_batch_size(n, *args):
     res = []
     for i in range(n):
+        print(i)
+        time_start = time.time_ns() / 10 ** 6
         res.append(batch_size_test(*args))
+        time_finish = time.time_ns() / 10 ** 6
+        print(time_finish - time_start)
     return np.mean(np.asarray(res), axis=0)
 
 def do_several_tests_with_consts(test_func, n, func, *args):
@@ -80,6 +82,6 @@ def batch_size_test(method, start, finish, data_size):
 
     for i in range(start, finish):
         func.set_batch(i)
-        iterations, _ = method.execute(start_point, func)
+        iterations, _ = method.simple_execute(start_point, func)
         res.append([i, iterations])
     return res
