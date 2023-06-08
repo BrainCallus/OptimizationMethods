@@ -1,20 +1,23 @@
 import logging
+import math
 from typing import Callable
 
 import numpy as np
 from numpy.linalg import pinv
+from numpy.linalg import norm
 
 logger = logging.getLogger(__name__)
 
 
-class GN_Met:
+class DogLeg_Met:
 
     def __init__(self, function: Callable, max_iter: int = 1000, eps: float = 10 ** (-3),
-                 min_val: float = 10 ** (-9), init_data: np.ndarray = None,
+                 trust_reg: float = 1.0, min_val: float = 10 ** (-9), init_data: np.ndarray = None,
                  ):
         self.function = function
         self.max_iter = max_iter  # iteration limit to prevent infinity loop
         self.eps = eps
+        self.trust_reg = trust_reg
         self.min_val = min_val  # break-point, if reached, regression will be stopped
         self.coefficients = None
         self.x = None
@@ -44,7 +47,6 @@ class GN_Met:
             diverg = self.getDivergence()
             sub_iter, sigma = self.getSigma(diverg)
             iter = iter + sub_iter
-            # x_(k+1)=x_k-(transpose(J(x_k))J(x_k))^-1*transpose(J(x_k)*r(x_k)
             self.coefficients = self.coefficients - sigma
             cur_square = np.sqrt(np.sum(diverg ** 2))
             logger.info(f"Epoch {epoch}: CUR {cur_square}")
@@ -61,9 +63,25 @@ class GN_Met:
 
         return epoch, iter
 
+    # only here the difference with Gauss-Newton and additional field trust_reg
     def getSigma(self, diverg):
         sub_iters, jacobian = self.compute_jacobian(self.coefficients, step=10 ** (-3))
-        return sub_iters, self.pseudo_inverse(jacobian) @ diverg
+        sigma_gn = self.pseudo_inverse(jacobian) @ diverg
+        if norm(sigma_gn) < self.trust_reg:
+            return sub_iters, sigma_gn
+        sigma_sd = jacobian.T @ diverg
+        t = norm(sigma_sd) ** 2 / norm(jacobian @ sigma_sd) ** 2
+        if t * norm(sigma_sd) > self.trust_reg:
+            return sub_iters, self.trust_reg / norm(sigma_sd) * sigma_sd
+        return sub_iters, t * sigma_sd + self.getS(sigma_gn, t * sigma_sd) * (sigma_gn - t * sigma_sd)
+
+    def getS(self, sigm_gn, tsigm_sd):
+        dif = sigm_gn - tsigm_sd
+        scal = np.dot(tsigm_sd, dif)
+        ndif = norm(dif)
+        nsd = norm(tsigm_sd)
+        discr = 4 * scal * scal + 4 * (self.trust_reg * self.trust_reg - nsd * nsd) * ndif ** 2
+        return (-2 * scal + math.sqrt(discr)) / (2 * ndif ** 2)
 
     def getDivergence(self) -> np.ndarray:
         return self.compute_divergence(self.coefficients)
@@ -93,3 +111,4 @@ class GN_Met:
     def pseudo_inverse(x: np.ndarray) -> np.ndarray:
         # Moore-Penrose inverse.
         return pinv(x.T @ x) @ x.T
+    # (J^tJ)^-1 J^T

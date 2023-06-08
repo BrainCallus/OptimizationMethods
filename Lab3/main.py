@@ -1,5 +1,6 @@
 import logging
 from gauss_newton import *
+from powell_dogLeg import *
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -27,7 +28,7 @@ def main():
     yn = y + NOISE * np.random.randn(len(x))
 
     # NonBlocking method with iterations limit
-    solver = GN_Met(function=func, max_iter=100000, eps=10 ** (-6))
+    solver = DogLeg_Met(function=func, max_iter=100000, eps=10 ** (-5), trust_reg=500)
     data = 1000000 * np.random.random(len(init_coefs))
     epoch, iters = solver.recoverCoefs(x, yn, data)
     computed = solver.get_computed_coefs()
