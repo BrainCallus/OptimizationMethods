@@ -9,8 +9,12 @@ logger = logging.getLogger(__name__)
 
 class GN_Met:
 
-    def __init__(self, function: Callable, max_iter: int = 1000, eps: float = 10 ** (-3),
-                 min_val: float = 10 ** (-9), init_data: np.ndarray = None,
+    def __init__(self,
+                 function: Callable,
+                 max_iter: int = 1000,
+                 eps: float = 10 ** (-3),
+                 min_val: float = 10 ** (-9),
+                 init_data: np.ndarray = None
                  ):
         self.function = function
         self.max_iter = max_iter  # iteration limit to prevent infinity loop
@@ -24,8 +28,6 @@ class GN_Met:
             self.init_data = init_data
 
     def recoverCoefs(self, x: np.ndarray, y: np.ndarray, init_data: np.ndarray = None):
-        """"-> np.ndarray:"""
-
         self.x = x
         self.y = y
         if init_data is not None:

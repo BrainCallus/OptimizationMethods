@@ -4,11 +4,8 @@ import numpy as np
 в точности функция wolfe из 1 лабы, изменено только название))
 """
 
-def line_search(x, p, f, grad):
+def line_search(x, p, f, grad, c1=1e-4, c2=0.9, alf=1):
     nabl = grad(x)
-    alf = 1
-    c1 = 1e-4
-    c2 = 0.9
     fx = f(x)
     new_x = x + alf * p
     new_nabl = grad(new_x)
@@ -34,18 +31,14 @@ def BFGS(x, eps, f, grad):
         alf = line_search(x, p, f, grad)
         new_nabl = grad(x + alf * p)
         y = new_nabl - nabl
-        y = np.array([y], dtype='float64')
-        y = np.reshape(y, (dim, 1))
         s = alf * p
-        s = np.array([s], dtype='float64')
-        s = np.reshape(s, (dim, 1))
         r = 1 / (y.T @ s)
         li = (np.eye(dim) - (r * (s @ y.T)))
         ri = (np.eye(dim) - (r * (y @ s.T)))
         hess_inter = li @ aprox_hessian @ ri
         aprox_hessian = hess_inter + (r * (s @ s.T))
-        nabl = new_nabl[:]
-        x = x + alf * p
+        nabl = new_nabl
+        x += alf * p
         steps_arg.append(x)
         steps_f.append(f(x))
         i += 1

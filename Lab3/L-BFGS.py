@@ -1,4 +1,5 @@
 import math
+
 import numpy as np
 
 """"
@@ -29,56 +30,51 @@ def line_search(x, p, f, grad):
 """
 
 
-def BFGS(x, eps, f, grad, queue_sz):
+def L_BFGS(x, eps, f, grad, queue_sz):
     steps_arg = [x]
     steps_f = [f(x)]
-    sList = []  # должны выполнять роль очереди размера <= queue_sz
-    yList = []
-    rhoList = []
-    alphaList = []
+    queue_alpha = []
+    queue_s_y_rho = []
     i = 1
     nabl = grad(x)
-    xPrev = x
-    gradPrev = nabl - nabl
-    while np.linalg.norm(nabl) > eps:
-        q = grad(x)
-        j = 0
-        while j < rhoList.__len__():
-            rho = rhoList[j]
-            s = sList[j]
-            y = yList[j]
-            alpha = np.dot(s, q) * rho
-            q = q - y * alpha
-            j = j + 1
-        gamma = 1.0
-        if i != 1:
-            gamma = np.dot(sList[0], yList[0]) / (np.dot(yList[0], yList[0]) + eps * 10 ** (-3))
-        r = q * gamma
-        j = rhoList.__len__() - 1
-        while j >= 0:
-            rho = rhoList[j]
-            y = yList[j]
-            s = sList[j]
-            alpha = alphaList[j]
-            betta = rho * np.dot(y, r)
-            r = r + s * (alpha - betta)
-            j = j - 1
+    grad_prev = nabl - nabl
 
-        if rhoList.__len__() == queue_sz:
-            sList.pop()
-            yList.pop()
-            rhoList.pop()
-            alphaList.pop()
-            # тут типа из очереди удаляем последний элемент для sList, yList, rhpList, alphaList
+    while np.linalg.norm(nabl) > eps:
+        q = nabl
+
+        for j in range(len(queue_s_y_rho)):
+            s, y, rho = queue_s_y_rho[j]
+            alpha = np.dot(s, q) * rho
+            q -= y * alpha
+
+        gamma = 1
+        if i != 1:
+            s, y, _ = queue_s_y_rho[0]
+            gamma = np.dot(s, y) / (np.dot(y, y) + eps * 10 ** (-3))
+        r = q * gamma
+
+        for j in range(len(queue_s_y_rho)-1, -1, -1):
+            s, y, rho = queue_s_y_rho[j]
+            alpha = queue_alpha[j]
+            betta = rho * np.dot(y, r)
+            r += s * (alpha - betta)
+
+        if len(queue_s_y_rho) == queue_sz:
+            queue_s_y_rho.pop()
+            queue_alpha.pop()
+
         alf = line_search(x, -r, f, nabl)
-        xPrev = x
-        x = x - r * alf
+        x_prev = x
+        x -= r * alf
         nabl = grad(x)
-        sList.insert(0, x - xPrev)
-        yList.insert(0, nabl - gradPrev)
-        rhoList.insert(0, 1.0 / (np.dot(yList[0], sList[0]) + eps * 10 ** (-3)))
-        alphaList.insert(0, alf)
-        gradPrev = nabl
+        s, y, _ = queue_s_y_rho[0]
+        queue_s_y_rho.insert(0, [
+            x - x_prev,
+            nabl - grad_prev,
+            1.0 / (np.dot(y, s) + eps * 10 ** (-3))
+        ])
+        queue_alpha.insert(0, alf)
+        grad_prev = nabl
         steps_arg.append(x)
         steps_f.append(f(x))
         i += 1
