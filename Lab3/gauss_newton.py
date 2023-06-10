@@ -1,5 +1,3 @@
-import numpy as np
-
 from OptimizationMethods.Lab3.abs import absNewton
 
 

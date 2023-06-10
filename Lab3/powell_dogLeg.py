@@ -18,7 +18,6 @@ class DogLeg_Met(absNewton):
         super().__init__(function, max_iter, eps, min_val, init_data)
         self.trust_reg = trust_reg
 
-    # only here the difference with Gauss-Newton and additional field trust_reg
     def getSigma(self, diverg):
         sub_iters, jacobian = self.compute_jacobian(self.coefficients, step=10 ** (-3))
         sigma_gn = self.pseudo_inverse(jacobian) @ diverg
