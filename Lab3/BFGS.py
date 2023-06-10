@@ -29,9 +29,6 @@ class absBFGS(ABC):
         return alf
 
 class BFGS(absBFGS):
-    def __init__(self):
-        pass
-
     def execute(self, x, eps, f, grad):
         dim = len(x)
         steps_arg = [x]
