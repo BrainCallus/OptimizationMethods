@@ -1,10 +1,10 @@
-from OptimizationMethods.Lab2.execute_lib.tests import *
-from OptimizationMethods.Lab2.execute_lib.graphics import *
-from OptimizationMethods.Lab2.execute_lib.excel import *
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.lib.learning_rates import *
-from OptimizationMethods.Lab2.lib.methods import *
-from OptimizationMethods.Lab2.lib.regularization import *
+from Lab2.execute_lib.tests import *
+from Lab2.execute_lib.graphics import *
+from Lab2.execute_lib.excel import *
+from Lab2.lib.functions_and_gradients import *
+from Lab2.lib.learning_rates import *
+from Lab2.lib.methods import *
+from Lab2.lib.regularization import *
 
 
 reg = NoRegularization()
@@ -24,11 +24,11 @@ ada_grad = AdaGrad(lr=lr, regularization=reg)
 lr = const_learning_rate(0.1)
 rms_prop = RMSProp(lr=lr, regularization=reg)
 
-lr = const_learning_rate(0.1)
+lr = exp_learning_rate(95)
 adam = Adam(lr=lr, regularization=reg)
 
 
-start = [-40, 45]
+start = [-5, 2]
 func = lambda x: x[0] ** 2 + 9 * x[1] ** 2 + 5
 grad = lambda x: [2 * x[0], 18 * x[1]]
 function = Function(func, grad, title="$x^2 + 9y^2 + 5$")

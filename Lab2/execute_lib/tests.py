@@ -1,10 +1,10 @@
 import time
 
-from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.lib.polynom_function import polynom
-from OptimizationMethods.Lab2.execute_lib.regression_generation import generate_descent_polynom
-from OptimizationMethods.Lab2.lib.regularization import *
+from Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
+from Lab2.lib.functions_and_gradients import *
+from Lab2.lib.polynom_function import polynom
+from Lab2.execute_lib.regression_generation import generate_descent_polynom
+from Lab2.lib.regularization import *
 
 
 def do_several_tests_batch_size(n, *args):
@@ -72,8 +72,8 @@ def batch_size_test(method, start, finish, data_size):
     if start <= 0 or start >= finish or finish >= data_size : return None
 
     start_point = [0, 0]
-    xs, ys, y_real = generate_descent_polynom(15, polynom([np.random.uniform(0, 10), np.random.uniform(0, 10)]),
-                                              data_size)
+    xs, ys, y_real = generate_descent_polynom(50, polynom([np.random.uniform(0, 10), np.random.uniform(0, 10)]),
+                                              100)
 
     xy = np.dstack((xs, ys))[0]
     res = []

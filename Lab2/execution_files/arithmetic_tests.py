@@ -1,9 +1,9 @@
-from OptimizationMethods.Lab2.execute_lib.tests import *
-from OptimizationMethods.Lab2.execute_lib.graphics import *
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.lib.learning_rates import *
-from OptimizationMethods.Lab2.lib.methods import *
-from OptimizationMethods.Lab2.lib.regularization import *
+from Lab2.execute_lib.tests import *
+from Lab2.execute_lib.graphics import *
+from Lab2.lib.functions_and_gradients import *
+from Lab2.lib.learning_rates import *
+from Lab2.lib.methods import *
+from Lab2.lib.regularization import *
 
 
 reg = NoRegularization()
@@ -32,7 +32,7 @@ func = lambda x: x[0] ** 2 + 9 * x[1] ** 2 + 5
 grad = lambda x: [2 * x[0], 18 * x[1]]
 function = Function(func, grad, title="$x^2 + 9y^2 + 5$")
 
-test_count = 500
+test_count = 100
 res = do_several_tests_with_consts(arithmetics_test, test_count, function, gd, momentum, nag, ada_grad, rms_prop, adam)
 
 

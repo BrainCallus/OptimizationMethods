@@ -1,9 +1,9 @@
-from OptimizationMethods.Lab2.execute_lib.excel import make_excel_table
-from OptimizationMethods.Lab2.execute_lib.graphics import show_tests_graph, show_3d_plot
-from OptimizationMethods.Lab2.lib.methods import *
-from OptimizationMethods.Lab2.lib.learning_rates import *
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.lib.regularization import *
+from Lab2.execute_lib.excel import make_excel_table
+from Lab2.execute_lib.graphics import show_tests_graph, show_3d_plot
+from Lab2.lib.methods import *
+from Lab2.lib.learning_rates import *
+from Lab2.lib.functions_and_gradients import *
+from Lab2.lib.regularization import *
 
 def convergence_test(l):
     res = []

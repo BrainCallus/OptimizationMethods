@@ -1,16 +1,17 @@
-from OptimizationMethods.Lab2.lib.methods import *
-from OptimizationMethods.Lab2.lib.learning_rates import *
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.execute_lib.graphics import *
-from OptimizationMethods.Lab2.lib.regularization import *
+from Lab2.lib.methods import *
+from Lab2.lib.learning_rates import *
+from Lab2.lib.functions_and_gradients import *
+from Lab2.execute_lib.graphics import *
+from Lab2.lib.regularization import *
 
 reg = NoRegularization()
 
-lr = const_learning_rate(0.1)
+lr = const_learning_rate(0.08)
 gd = GD(lr=lr, regularization=reg)
 
-lr = exp_learning_rate(0.07)
+lr = exp_learning_rate(0.042) # 0.094
 momentum = Momentum(lr=lr, regularization=reg)
+lr = exp_learning_rate(0.06)# 0.075
 nag = NAG(lr=lr, regularization=reg)
 
 # lr = exp_learning_rate(90)
@@ -20,7 +21,7 @@ ada_grad = AdaGrad(lr=lr, regularization=reg)
 
 lr = const_learning_rate(5)
 rms_prop = RMSProp(lr=lr, regularization=reg)
-lr = exp_learning_rate(85)
+lr = exp_learning_rate(22)
 adam = Adam(lr=lr, regularization=reg)
 
 start = [-40, 45]
