@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import LinearLocator
 
-from Lab2.execute_lib.help_functions import *
+from OptimizationMethods.Lab2.execute_lib.help_functions import *
 
 
 def draw_regression(method, function, start, data, data_real, init_coefs, title=False):
@@ -121,20 +121,31 @@ def show_tests_graph(res,
 
     plt.show()
 
-def show_3d_plot(res, title=None, plot_comment =None):
 
-    @np.vectorize
-    def make_z(i, j):
-        return res[i][j]
+def show_several_graph(res,
+                     title=None,
+                     xy_names=None,
+                     plot_comments=None,
+                     plot_comm=None):
+    ax = plt.subplot()
 
-    res = np.asarray(res)
-    x = np.arange(0, len(res))
-    y = np.arange(0, len(res[0]))
-    xs, ys = np.meshgrid(x, y)
+    for i in range(len(res)):
+        xs = [i[0] for i in res[i]]
+        ys = [i[1] for i in res[i]]
+        plot, = ax.plot(xs, ys)
+        if plot_comments is not None:
+            plot.set_label(plot_comments[i])
+            ax.legend(prop='monospace')
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.set_zlim(-0.01, 1.01)
-    ax.plot_surface(xs, ys, make_z(xs, ys))
+
+    if plot_comm is not None:
+        p, = ax.plot([], [], color="w")
+        p.set_label(plot_comm)
+        ax.legend(prop='monospace')
+    if title is not None:
+        plt.title(title)
+    if xy_names is not None:
+        plt.xlabel(xy_names[0])
+        plt.ylabel(xy_names[1])
 
     plt.show()

@@ -64,6 +64,7 @@ class L_BFGS(absBFGS):
         queue_alpha = []
         queue_s_y_rho = []
         i = 1
+        c1 = 10 ** (-3)
         nabl = grad(x)
         grad_prev = nabl - nabl
 
@@ -78,7 +79,7 @@ class L_BFGS(absBFGS):
             gamma = 1
             if i != 1:
                 s, y, _ = queue_s_y_rho[0]
-                gamma = np.dot(s, y) / (np.dot(y, y) + eps * 10 ** (-3))
+                gamma = np.dot(s, y) / (np.dot(y, y) + eps * c1)
             r = q * gamma
 
             for j in range(len(queue_s_y_rho)-1, -1, -1):

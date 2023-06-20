@@ -1,30 +1,33 @@
 import time
 
-from Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
-from Lab2.lib.functions_and_gradients import *
-from Lab2.lib.polynom_function import polynom
-from Lab2.execute_lib.regression_generation import generate_descent_polynom
-from Lab2.lib.regularization import *
+import numpy as np
+
+from OptimizationMethods.Lab2.execute_lib.graphics import draw_regression
+from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
+from OptimizationMethods.Lab2.lib.functions_and_gradients import *
+from OptimizationMethods.Lab2.lib.polynom_function import polynom
+from OptimizationMethods.Lab2.execute_lib.regression_generation import generate_descent_polynom
+from OptimizationMethods.Lab2.lib.regularization import *
+from OptimizationMethods.Lab2.lib.learning_rates import *
 
 
 def do_several_tests_batch_size(n, *args):
     res = []
     for i in range(n):
-        print(i)
+        print(i) # номер теста
         time_start = time.time_ns() / 10 ** 6
         res.append(batch_size_test(*args))
         time_finish = time.time_ns() / 10 ** 6
-        print(time_finish - time_start)
+        print(time_finish - time_start) # затраченное время
     return np.mean(np.asarray(res), axis=0)
 
-def do_several_tests_with_consts(test_func, n, func, *args):
+def do_several_tests_with_consts(test_func, n, *args):
     if n == 0: return None
 
     res = []
     names = []
     for i in range(n):
-        start = [np.random.uniform(-40, 40), np.random.uniform(-40, 40)]
-        press = test_func(func, start, *args)
+        press = test_func(*args)
         names = [i[0] for i in press]
         value = [i[1] for i in press]
         res.append(value)
@@ -32,19 +35,60 @@ def do_several_tests_with_consts(test_func, n, func, *args):
     return np.dstack((names, np.mean(np.asarray(res), axis=0)))[0]
 
 
-def regularization_test(function, start, method, real_value):
+def scheduling_test(function, method, real_value):
+    res = []
+    start = [np.random.uniform(-10, 10), np.random.uniform(-10, 10)]
+    regs = ['Const', 'Exp', 'Time', 'Step']
+    regs = np.asarray(regs, dtype='object')
+    rs = [const_learning_rate(100), exp_learning_rate(100), time_learning_rate(100), step_learning_rate(100, 100)]
+    for i in rs:
+        method.set_lr(i)
+        iter, result = method.simple_execute(start, function)
+        if result[-1] > real_value + 100:
+            res.append(real_value)
+        else:
+            res.append(result[-1])
+        # res.append(iter)
+    res = np.asarray(res)
+    res = np.abs(res - real_value) * 10 ** 6
+    return np.dstack((regs, res))[0]
+
+
+def regularization_test(function, method, real_value):
+    res = []
+    start = [np.random.uniform(-10, 10), np.random.uniform(-10, 10)]
+    regs = ['NoRegularization', 'L1', 'L2', 'Elastic']
+    regs = np.asarray(regs, dtype='object')
+    rs = [NoRegularization(), L1Regularization(), L2Regularization(), Elastic()]
+    for i in rs:
+        method.set_regularization(i)
+        iter, result = method.execute(start, function)
+        res.append(result[-1][1])
+        # res.append(iter)
+    res = np.asarray(res)
+    res = (res - real_value)
+    return np.dstack((regs, res))[0]
+
+
+def regularization_test_generate(method):
     res = []
     regs = ['NoRegularization', 'L1', 'L2', 'Elastic']
     regs = np.asarray(regs, dtype='object')
     rs = [NoRegularization(), L1Regularization(), L2Regularization(), Elastic()]
-
-    for i in range(4):
-        method.set_regularization(rs[i])
-        _, result = method.execute(start, function)
-        res.append(result[-1][1])
+    real_value = [np.random.uniform(-10, 10), np.random.uniform(-10, 10)]
+    start = [np.random.uniform(10, 30), np.random.uniform(10, 30)]
+    xs, ys, _ = generate_descent_polynom(5, polynom(real_value), 300)
+    data = np.dstack((xs, ys))[0]
+    function = BatchGD(quadratic_error_func, quadratic_error_func_grad, data)
+    for i in rs:
+        method.set_regularization(i)
+        a, result = method.simple_execute(start, function)
+        res.append(a)
+        # print(result)
+        # draw_regression(method, function, start, data, data, real_value)
     res = np.asarray(res)
-    res = (res - real_value)
-
+    # print(res)
+    # res = [np.mean(i) for i in (np.abs(res / real_value))]
     return np.dstack((regs, res))[0]
 
 def arithmetics_test(function, start, *methods):
@@ -68,20 +112,32 @@ def time_test(function, start, names, *methods):
         i += 1
     return res
 
-def batch_size_test(method, start, finish, data_size):
-    if start <= 0 or start >= finish or finish >= data_size : return None
+def batch_size_test(method, start, finish, step, data_size):
+    if start <= 0 or start >= finish or finish > data_size : return None
 
-    start_point = [0, 0]
-    xs, ys, y_real = generate_descent_polynom(50, polynom([np.random.uniform(0, 10), np.random.uniform(0, 10)]),
-                                              100)
+    start_point = [np.random.uniform(-10, 10), np.random.uniform(-10, 10)]
+    real = [np.random.uniform(5, 10), np.random.uniform(5, 10)]
+    xs, ys, y_real = \
+        generate_descent_polynom(
+            10,
+            polynom(real),
+            data_size
+        )
 
     xy = np.dstack((xs, ys))[0]
     res = []
 
     func = MiniBatchGD(quadratic_error_func, quadratic_error_func_grad, xy)
 
-    for i in range(start, finish):
+    print(real)
+    print(start_point)
+
+    for i in range(start, finish + 1, step):
         func.set_batch(i)
-        iterations, _ = method.simple_execute(start_point, func)
-        res.append([i, iterations])
+        time_start = time.time_ns() / 10 ** 9
+        iterations, r = method.simple_execute(start_point, func)
+        time_finish = time.time_ns() / 10 ** 9
+        t = time_finish - time_start
+        print(i, iterations, r, t)
+        res.append([i, t])
     return res

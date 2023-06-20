@@ -8,6 +8,9 @@ class learning_rate(ABC):
         self.decay = 0.05
         self.min_value = 0.001
 
+    def restart(self):
+        self.value = self.initial_rate
+
     def get(self):
         return self.value
 

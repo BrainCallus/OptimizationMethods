@@ -1,12 +1,12 @@
 import math
 import numpy as np
-from Lab2.lib.learning_rates import learning_rate, const_learning_rate
-from Lab2.lib.regularization import NoRegularization, Regularization
+from OptimizationMethods.Lab2.lib.learning_rates import learning_rate, const_learning_rate
+from OptimizationMethods.Lab2.lib.regularization import NoRegularization, Regularization
 from abc import ABC, abstractmethod
 
 
 class Method(ABC):
-    def __init__(self, lr=None, eps=None, regularization=None):
+    def __init__(self, lr=None, eps=None, regularization=None, max_iterations=10000):
         if lr is None or not (isinstance(lr, learning_rate)):
             self.lr = const_learning_rate(0.01)
         else:
@@ -19,7 +19,7 @@ class Method(ABC):
             self.regularization = NoRegularization()
         else:
             self.regularization = regularization
-
+        self.max_iterations = max_iterations
         self.start = None
 
     def set_lr(self, lr):
@@ -30,6 +30,9 @@ class Method(ABC):
 
     def set_eps(self, eps):
         self.eps = eps
+
+    def set_max_iterations(self, n):
+        self.max_iterations = n;
 
     def set_regularization(self, regularization):
         if isinstance(regularization, Regularization):
@@ -68,39 +71,32 @@ class Method(ABC):
         """
         pass
 
-    def execute(self, start, f):
+    def exec(self, start, f, steps_change):
         i = 2
         x_cur = np.asarray(start)
         x_prev = x_cur - self.get_lr()
         f_cur, f_prev = self.calc_func(f, x_cur), self.calc_func(f, x_prev)
         steps = [[x_prev, f_prev], [x_cur, f_cur]]
         self.set_params(f, x_prev)
-        while math.fabs(f_cur - f_prev) > self.eps:
+        while math.fabs(f_cur - f_prev) > self.eps and i < self.max_iterations:
             x_cur = self.change_x(f, x_cur, i)
             f_prev = f_cur
             f_cur = self.calc_func(f, x_cur)
-            steps.append(np.asarray([x_cur, f_cur], dtype='object'))
+            steps = steps_change(steps, [x_cur, f_cur])
             self.lr.change(i)
-            i = i + 1
-            # print("Func value: ", f_cur, ", iteration: ", i, ", delta: ", f_cur - f_prev)
+            i += 1
+        self.lr.restart()
         return i, np.asarray(steps, dtype='object')
 
+    def execute(self, start, f):
+        def st_change(steps, arr):
+            return steps + [arr]
+        return self.exec(start, f, st_change)
+
     def simple_execute(self, start, f):
-        i = 2
-        x_cur = np.asarray(start)
-        x_prev = x_cur - self.get_lr()
-        f_cur, f_prev = self.calc_func(f, x_cur), self.calc_func(f, x_prev)
-        steps = [x_prev, f_prev]
-        self.set_params(f, x_prev)
-        while math.fabs(f_cur - f_prev) > self.eps:
-            x_cur = self.change_x(f, x_cur, i)
-            f_prev = f_cur
-            f_cur = self.calc_func(f, x_cur)
-            steps = np.asarray([x_cur, f_cur], dtype='object')
-            self.lr.change(i)
-            i = i + 1
-            # print("Func value: ", f_cur, ", iteration: ", i, ", delta: ", f_cur - f_prev)
-        return i, steps
+        def st_change(steps, arr):
+            return arr
+        return self.exec(start, f, st_change)
 
 
 class GD(Method):

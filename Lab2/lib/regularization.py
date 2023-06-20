@@ -12,7 +12,7 @@ class NoRegularization(Regularization):
         return f.func(x)
 
 class L1Regularization(Regularization):
-    def __init__(self, alpha = 0.05):
+    def __init__(self, alpha = 0.075):
         self.alpha = alpha
 
     def calc(self, f, x):

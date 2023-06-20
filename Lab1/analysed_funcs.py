@@ -1,7 +1,6 @@
 import numpy as np
 import math
 
-
 # исследуемая функция № 1
 
 def used_func1(x):

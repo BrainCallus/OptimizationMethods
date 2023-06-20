@@ -45,14 +45,13 @@ class BatchGD(FunctionWithData):
 class MiniBatchGD(FunctionWithData):
     def __init__(self, function, gradient, data, batch_size=250):
         super().__init__(function, gradient, data)
-        self.batch = min(len(data), batch_size)
+        self.batch = min(self.data_size, batch_size)
+        np.random.shuffle(self.data)
 
     def set_batch(self, batch_size):
-        self.batch = batch_size
+        self.batch = min(self.data_size, batch_size)
 
 
     def grad(self, x):
-        # np.random.shuffle(self.data)
-        # return np.sum([self.gradient(x, self.data[i]) for i in range(self.batch)], axis = 0) / self.batch
         a = randint(0, self.data_size - self.batch)
         return np.sum([self.gradient(x, self.data[i]) for i in range(a, a + self.batch)], axis = 0) / self.batch
