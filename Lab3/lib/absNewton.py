@@ -4,7 +4,7 @@ from typing import Callable
 from abc import abstractmethod
 from numpy.linalg import pinv, norm
 
-from OptimizationMethods.Lab3.regression.absRegression import absRegression
+from OptimizationMethods.Lab3.lib.absRegression import absRegression
 
 
 class absNewton(absRegression):

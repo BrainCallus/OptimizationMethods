@@ -1,7 +1,7 @@
 import time
 import matplotlib.pyplot as plt
 
-from OptimizationMethods.Lab3.regression.batch_guys import *
+from OptimizationMethods.Lab3.lib.batch_guys import *
 
 NOISE = 100
 init_coefs = [-33, 14, 0.55]

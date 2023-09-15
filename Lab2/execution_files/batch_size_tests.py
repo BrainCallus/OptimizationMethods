@@ -3,23 +3,23 @@ from OptimizationMethods.Lab2.execute_lib.graphics import *
 from OptimizationMethods.Lab2.execute_lib.tests import *
 from OptimizationMethods.Lab2.execute_lib.vis_normalization import *
 
-lr = const_learning_rate(0.01)
-method = GD(lr=lr)
+lr = const_learning_rate(15)
+method = Adam(lr=lr)
 method.set_max_iterations(1000)
 
 t = time.time_ns()
 start = 1
-finish = 100
-n_points = 100
+finish = 1000
+n_points = 1000
 step = 1
-tests_count = 100
+tests_count = 1
 
 res0 = do_several_tests_batch_size(tests_count, method, start, finish, step, n_points)
 method.set_lr(exp_learning_rate(10))
 res1 = do_several_tests_batch_size(tests_count, method, start, finish, step, n_points)
 method.set_lr(time_learning_rate(10))
 res2 = do_several_tests_batch_size(tests_count, method, start, finish, step, n_points)
-method.set_lr(step_learning_rate(10, 10))
+method.set_lr(step_learning_rate(0.1, 20))
 res3 = do_several_tests_batch_size(tests_count, method, start, finish, step, n_points)
 
 print("Время исполнения:", (time.time_ns() - t) / 10 ** 9, "секунд")
@@ -33,7 +33,7 @@ show_several_graph([res0, res1, res2, res3], title="Different lr dependence of t
                  plot_comm = "Average of " + str(tests_count) + " tests")
 res = [res0, res1, res2, res3]
 
-f = open("/home/natalia/HW/MetOpt/OptimizationMethods/Lab2/execution_files/test0.txt", "w")
+f = open("/home/natalia/HW/MetOpt/OptimizationMethods/Lab2/execution_files/test.txt", "w")
 for j in range(len(res)):
     f.write("aaa\n")
     for i in range(len(res[j])):

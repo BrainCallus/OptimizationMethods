@@ -1,11 +1,11 @@
 from typing import Callable
 
 
-from OptimizationMethods.Lab3.regression.errors_functions import quadratic_error_func, quadratic_error_func_grad
-from OptimizationMethods.Lab3.regression.absRegression import absRegression
-from OptimizationMethods.Lab3.regression.min_methods import *
-from OptimizationMethods.Lab3.regression.functions import *
-from OptimizationMethods.Lab3.regression.learning_rates import *
+from OptimizationMethods.Lab3.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
+from OptimizationMethods.Lab3.lib.absRegression import absRegression
+from OptimizationMethods.Lab3.lib.min_methods import *
+from OptimizationMethods.Lab3.lib.functions import *
+from OptimizationMethods.Lab3.lib.learning_rates import *
 
 class GDRegression(absRegression):
     @property
