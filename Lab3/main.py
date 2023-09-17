@@ -1,23 +1,23 @@
 import time
+from numpy import cos, sin, log2
+
 import matplotlib.pyplot as plt
 
+from OptimizationMethods.Lab3.BFGS import *
 from OptimizationMethods.Lab3.lib.batch_guys import *
+from OptimizationMethods.Lab3.lib.absNewton import *
 
-NOISE = 100
-init_coefs = [-33, 14, 0.55]
+NOISE = 10
+init_coefs = [-33]
 
+def func(x, coeff):
+    return coeff[0] * cos(x)
 
 def funcToString(init_coefs):
     return "$ Initial: " + " + ".join([
         f"{init_coefs[i]:.3f}" +
-        " \cdot x ^ {" + str(i) + "}"
+        " \cdot x ^{" + str(i) + "}"
         for i in range(len(init_coefs))]) + "$"
-
-
-def func(x, coeff):
-    return coeff[2] * x ** 2 + coeff[1] * x\
-        + coeff[0]
-
 
 def main():
     r = 99
@@ -27,7 +27,17 @@ def main():
     data = 10 * np.random.random(len(init_coefs))
 
     st = time.time_ns()
-    solver1 = MiniBatch(function=func, max_iter=10000, eps=10 ** (-5))
+    method1 = Adam()
+    method2 = GD()
+    method3 = NAG()
+    method4 = Momentum()
+    method5 = Golden()
+    mainMethod = method5 # основной метод
+    solver1 = DogLeg_Met(function=func, max_iter=10000, eps=10 ** (-5))
+    solver2 = GN_Met(function=func, max_iter=10000, eps=10 ** (-5))
+    solver3 = MiniBatch(function=func, max_iter=10000, eps=10 ** (-5), method=mainMethod)
+    # solver4 = BFGS()
+    mainSolver = solver2 # основной солвер
     epoch1, iters1 = solver1.recoverCoefs(x, yn, data)
     computed1 = solver1.get_computed_coefs()
     divergence1 = solver1.getDivergence()
@@ -39,7 +49,7 @@ def main():
     plt.plot(x, y, label="Initial function", linewidth=2)
     plt.plot(x, yn, label="Randomized data", linewidth=2)
     plt.plot(x, computed1, label="Computed: epoch " + str(epoch1) + "; real_iter " + str(iters1), linewidth=2)
-    plt.plot(x, divergence1, label="Divergence", linewidth=2)
+    # plt.plot(x, divergence1, label="Divergence", linewidth=2)
     plt.title(string_func)
     plt.xlabel("X")
     plt.ylabel("Y")
@@ -47,11 +57,12 @@ def main():
     plt.legend()
     plt.show()
 
+    print("Время выполнения")
+    print(time1 / 1000000000)
+    print("Инит")
     print(init_coefs)
-    print()
-    print(time1)
+    print("Полученные коэффициенты")
     print(solver1.coefficients)
-    print(solver1.coefficients / init_coefs)
 
 if __name__ == "__main__":
     main()
