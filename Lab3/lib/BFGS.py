@@ -86,25 +86,31 @@ class L_BFGS(absBFGS):
         self.queue_sz = queue_size
 
     def execute(self):
-        queue_alpha = []
-        queue_s_y_rho = []
+        queue_alpha = [self.eps]
+        dim = len(self.coefficients)
         i = 1
+        a = 0.1
+        gg = [10]
+        dd = [10]
         c1 = 10 ** (-3)
+        queue_s_y_rho = [[
+            np.array([a for _ in range(dim)]),
+            np.array([a for _ in range(dim)]),
+            1 / (np.array([a for _ in range(dim)]).T @ np.array([a for _ in range(dim)]))
+        ]]
+
         nabl = self.func.grad(self.coefficients)
-        grad_prev = nabl - nabl
+        grad_prev = nabl
 
-        while np.linalg.norm(nabl) > self.eps:
-            q = nabl
-
+        while np.linalg.norm(dd) > self.eps and i < self.max_iter:
+            q = nabl.copy()
             for j in range(len(queue_s_y_rho)):
                 s, y, rho = queue_s_y_rho[j]
-                alpha = np.dot(s, q) * rho
+                alpha = s @ q * rho
                 q -= y * alpha
 
-            gamma = 1
-            if i != 1:
-                s, y, _ = queue_s_y_rho[0]
-                gamma = np.dot(s, y) / (np.dot(y, y) + self.eps * c1)
+            s, y, _ = queue_s_y_rho[-1]
+            gamma = (s @ y) / ((y @ y) + c1)
             r = q * gamma
 
             for j in range(len(queue_s_y_rho)-1, -1, -1):
@@ -114,20 +120,23 @@ class L_BFGS(absBFGS):
                 r += s * (alpha - betta)
 
             if len(queue_s_y_rho) == self.queue_sz:
-                queue_s_y_rho.pop()
-                queue_alpha.pop()
+                queue_s_y_rho.pop(0)
+                queue_alpha.pop(0)
 
             alf = self.line_search(self.coefficients, -r)
-            x_prev = self.coefficients
-            self.coefficients -= r * alf
+            dd = r * alf
+            self.coefficients -= dd
             nabl = self.func.grad(self.coefficients)
+            gg = nabl - grad_prev
+            grad_prev = nabl
             s, y, _ = queue_s_y_rho[0]
             queue_s_y_rho.insert(0, [
-                self.coefficients - x_prev,
-                nabl - grad_prev,
+                dd,
+                gg,
                 1.0 / (np.dot(y, s) + self.eps * 10 ** (-3))
             ])
             queue_alpha.insert(0, alf)
-            grad_prev = nabl
             i += 1
+
+        print(nabl, gg, dd)
         return i

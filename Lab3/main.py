@@ -13,7 +13,7 @@ from OptimizationMethods.Lab3.visual import funcToString
 
 # Настройки данных
 def func(x, coeff):
-    return np.asarray(coeff[0] * log(x)**2 + coeff[1] * cos(x))
+    return np.asarray(coeff[0] * log(x) + coeff[1] * cos(x))
 
 NOISE = 10
 DATA_SIZE = 100
@@ -33,7 +33,7 @@ def main():
     method5 = Golden(lr=exp_learning_rate(1))
     method6 = AdaGrad(lr=exp_learning_rate(10))
     method7 = RMSProp(lr=exp_learning_rate(10))
-    mainMethod = method2  # основной метод (solver 3,4,5)
+    mainMethod = method7  # основной метод (solver 3,4,5)
 
     solver1 = DogLeg_Met(function=func)
     solver2 = GN_Met(function=func)
@@ -42,7 +42,7 @@ def main():
     solver5 = Stochastic(function=func, method=mainMethod)
     solver6 = BFGS(function=func)
     solver7 = L_BFGS(function=func)
-    mainSolver = solver7  # основной солвер
+    mainSolver = solver4  # основной солвер
 
     print(initX)
     epoch, iters = mainSolver.recoverCoefs(x, yn, initX)
