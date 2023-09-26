@@ -42,7 +42,7 @@ def main():
     solver5 = Stochastic(function=func, method=mainMethod)
     solver6 = BFGS(function=func)
     solver7 = L_BFGS(function=func)
-    mainSolver = solver6  # основной солвер
+    mainSolver = solver7  # основной солвер
 
     print(initX)
     epoch, iters = mainSolver.recoverCoefs(x, yn, initX)
