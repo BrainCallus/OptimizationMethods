@@ -1,13 +1,6 @@
-def error(x, dot):
-    res = 0
-    for i in range(len(x)):
-        res += x[i] * (dot[0] ** i)
-    return res - dot[1]
+def error(x, func, param):
+    return param[1] - func(param[0], x)
 
-def quadratic_error_func(x, data):
-    err = [(error(x, data[i]) ** 2) for i in range(len(data))]
-    return sum(err)
 
-def quadratic_error_func_grad(x, dot):
-    a = error(x, dot) * 2
-    return [a * dot[0] ** i for i in range(len(x))]
+def quadratic_error_func(x, func, data):
+    return sum([error(x, func, data[i]) ** 2 for i in range(len(data))])

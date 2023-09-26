@@ -36,25 +36,23 @@ class FunctionWithData(Function, ABC):
 class StochasticGD(FunctionWithData):
     def grad(self, x):
         dot = self.data[np.random.randint(0, self.data_size)]
-        return np.asarray(self.gradient(x, dot))
+        return np.asarray(self.gradient(x, [dot]))
 
 class BatchGD(FunctionWithData):
     def grad(self, x):
-        return np.sum([self.gradient(x, self.data[i]) for i in range(self.data_size)], axis=0) / self.data_size
+        return self.gradient(x, [self.data[i] for i in range(self.data_size)]) / self.data_size
 
 class MiniBatchGD(FunctionWithData):
     def __init__(self, function, gradient, data, batch_size=250):
         super().__init__(function, gradient, data)
         self.batch = min(self.data_size, batch_size)
-        np.random.shuffle(self.data)
 
     def set_batch(self, batch_size):
         self.batch = min(self.data_size, batch_size)
 
-    def get_batch(self, batch_size):
+    def get_batch(self):
         return self.batch
-
 
     def grad(self, x):
         a = randint(0, self.data_size - self.batch)
-        return np.sum([self.gradient(x, self.data[i]) for i in range(a, a + self.batch)], axis = 0) / self.batch
+        return self.gradient(x, [self.data[i] for i in range(a, a + self.batch)]) / self.batch

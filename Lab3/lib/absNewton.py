@@ -11,15 +11,11 @@ class absNewton(absRegression):
     def recoverCoefs(self,
                      x: np.ndarray,
                      y: np.ndarray,
-                     init_data: np.ndarray = None):
+                     init_data: np.ndarray):
         self.x = x
         self.y = y
-        if init_data is not None:
-            self.init_data = init_data
-        else:
-            raise Exception("Data for computation expected")
+        self.coefficients = init_data
 
-        self.coefficients = self.init_data
         prev_square = 100
         cur_square = 0
         epoch = 1
@@ -35,14 +31,14 @@ class absNewton(absRegression):
         return epoch, iter
 
     def compute_jacobian(self, x0: np.ndarray, step: float = 10 ** (-3)):
-        y0 = self.compute_divergence(x0)
+        y0 = self.computeDivergence(x0)
         jacobian = []
         sub_iter = 0
         for i, parameter in enumerate(x0):
             sub_iter += 1
             x = x0.copy()
             x[i] += step
-            y = self.compute_divergence(x)
+            y = self.computeDivergence(x)
             derivative = (y - y0) / step
             jacobian.append(derivative)
         jacobian = np.array(jacobian).T

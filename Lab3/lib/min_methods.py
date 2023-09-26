@@ -6,33 +6,26 @@ from abc import ABC, abstractmethod
 
 
 class Method(ABC):
-    def __init__(self, lr=None, eps=None, regularization=None, max_iterations=10000):
-        if lr is None or not (isinstance(lr, learning_rate)):
-            self.lr = const_learning_rate(0.01)
-        else:
-            self.lr = lr
-        if eps is None:
-            self.eps = 0.001
-        else:
-            self.eps = eps
-        if regularization is None or not (isinstance(regularization, Regularization)):
-            self.regularization = NoRegularization()
-        else:
-            self.regularization = regularization
+    def __init__(self,
+                 lr: learning_rate = const_learning_rate(0.01),
+                 eps: float = 0.001,
+                 regularization: Regularization = NoRegularization(),
+                 max_iterations: int = 1000):
+        self.lr = lr
+        self.eps = eps
+        self.regularization = regularization
         self.max_iterations = max_iterations
         self.start = None
 
-    def set_lr(self, lr):
-        if isinstance(lr, learning_rate):
-            self.lr = lr
-        else:
-            print("lr should be learning_rate class instance")
+    def set_lr(self,
+               lr: learning_rate):
+        self.lr = lr
 
     def set_eps(self, eps):
         self.eps = eps
 
     def set_max_iterations(self, n):
-        self.max_iterations = n;
+        self.max_iterations = n
 
     def set_regularization(self, regularization):
         if isinstance(regularization, Regularization):
@@ -55,21 +48,16 @@ class Method(ABC):
 
     @abstractmethod
     def set_params(self, grad, x):
-        pass
+        ...
 
     @abstractmethod
     def change_x(self, *args):
-        pass
+        ...
 
     @property
     @abstractmethod
     def math_operations(self):
-        """
-        :return:
-        количество математических операций
-        при подсчёте изменения x
-        """
-        pass
+        ...
 
     def exec(self, start, f, steps_change):
         i = 2
@@ -91,11 +79,13 @@ class Method(ABC):
     def execute(self, start, f):
         def st_change(steps, arr):
             return steps + [arr]
+
         return self.exec(start, f, st_change)
 
     def simple_execute(self, start, f):
         def st_change(_, arr):
             return arr
+
         return self.exec(start, f, st_change)
 
 
@@ -104,7 +94,7 @@ class GD(Method):
     math_operations = 2
 
     def set_params(self, grad, x):
-        pass
+        ...
 
     def change_x(self, *args):
         f = args[0]
@@ -116,14 +106,17 @@ class NAG(Method):
     name = "Nesterov"
     math_operations = 5
 
-    def __init__(self, gamma=0.6, lr=None, eps=None, regularization=None):
+    def __init__(self,
+                 gamma: float = 0.6,
+                 lr: learning_rate = const_learning_rate(100),
+                 eps: float = 0.001,
+                 regularization: Regularization = NoRegularization()):
         super().__init__(lr, eps, regularization)
         self.gamma = gamma
         self.change = None
 
     def set_params(self, f, x):
         self.change = - self.get_lr() * self.calc_grad(f, x)
-
 
     def change_x(self, *args):
         f = args[0]
@@ -139,7 +132,11 @@ class Momentum(Method):
     name = "Momentum"
     math_operations = 4
 
-    def __init__(self, momentum=0.612, lr=None, eps=None, regularization=None):
+    def __init__(self,
+                 momentum: float = 0.612,
+                 lr: learning_rate = const_learning_rate(100),
+                 eps: float = 0.001,
+                 regularization: Regularization = NoRegularization()):
         super().__init__(lr, eps, regularization)
         self.v = None
         self.momentum = momentum
@@ -158,7 +155,10 @@ class AdaGrad(Method):
     name = "AdaGrad"
     math_operations = 7
 
-    def __init__(self, lr=None, eps=None, regularization=None):
+    def __init__(self,
+                 lr: learning_rate = const_learning_rate(100),
+                 eps: float = 0.001,
+                 regularization: Regularization = NoRegularization()):
         super().__init__(lr, eps, regularization)
         self.non_zero_div = 0.0001
         self.B = None
@@ -178,7 +178,11 @@ class RMSProp(AdaGrad):
     name = "RMSProp"
     math_operations = 9
 
-    def __init__(self, gamma=0.9, lr=None, eps=None, regularization=None):
+    def __init__(self,
+                 gamma: float = 0.9,
+                 lr: learning_rate = const_learning_rate,
+                 eps: float = 0.001,
+                 regularization: Regularization = NoRegularization()):
         super().__init__(lr, eps, regularization)
         self.gamma = gamma
 
@@ -194,7 +198,12 @@ class Adam(AdaGrad):
     name = "Adam"
     math_operations = 16
 
-    def __init__(self, beta1=0.9, beta2=0.99, lr=None, eps=None, regularization=None):
+    def __init__(self,
+                 beta1: float = 0.9,
+                 beta2: float = 0.99,
+                 lr: learning_rate = const_learning_rate,
+                 eps: float = 0.001,
+                 regularization: Regularization = NoRegularization()):
         super().__init__(lr, eps, regularization)
         self.beta1 = beta1
         self.beta2 = beta2
@@ -217,13 +226,13 @@ class Adam(AdaGrad):
         vv = self.v / (1 - self.beta2 ** i)
         return x - (self.get_lr() / np.sqrt(vv + self.non_zero_div)) * mm
 
+
 class Golden(Method):
     name = "Golden"
     math_operations = 2
-    eps = 10 ** (-1)
 
     def set_params(self, grad, x):
-        pass
+        ...
 
     def change_x(self, *args):
         f = args[0]
@@ -245,5 +254,5 @@ class Golden(Method):
                 a, l1, f1 = l1, l2, f2
                 l2 = a + k2 * (b - a)
                 xx2 = x - l2 * grr
-                f2 =  self.calc_func(f, xx2)
+                f2 = self.calc_func(f, xx2)
         return x - (a + b) / 2 * self.calc_grad(f, x) * self.get_lr()

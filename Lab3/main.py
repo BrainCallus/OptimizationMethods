@@ -1,38 +1,39 @@
 import time
-from numpy import cos, sin, log2
+
+import numpy as np
+from numpy import cos, sin, log
 
 import matplotlib.pyplot as plt
 
-from OptimizationMethods.Lab3.BFGS import *
+from OptimizationMethods.Lab3.lib.BFGS import *
 from OptimizationMethods.Lab3.lib.batch_guys import *
 from OptimizationMethods.Lab3.lib.absNewton import *
+from OptimizationMethods.Lab3.visual import funcToString
 
-NOISE = 1000
-DATA_SIZE = 100000
-init_coefs = [-33, 22, 0.1]
 
+# Настройки данных
 def func(x, coeff):
-    return coeff[0] * cos(x) + coeff[1] * sin(x**2) + coeff[2] * x
+    return np.asarray(coeff[0] * log(x)**2 + coeff[1] * cos(x))
 
-def funcToString(init_coefs):
-    return "$ Initial: " + " + ".join([
-        f"{init_coefs[i]:.3f}" +
-        " \cdot x ^{" + str(i) + "}"
-        for i in range(len(init_coefs))]) + "$"
-
+NOISE = 10
+DATA_SIZE = 100
+init_coefs = [-33, 22]
+x = np.arange(1, 1 + DATA_SIZE)
+y = func(x, init_coefs)
+yn = y + NOISE * np.random.randn(DATA_SIZE)
+initX = 10 * np.random.random(len(init_coefs))
 def main():
-    x = np.arange(1, 1 + DATA_SIZE)
-    y = func(x, init_coefs)
-    yn = y + NOISE * np.random.randn(DATA_SIZE)
-    data = 10 * np.random.random(len(init_coefs))
-
     st = time.time_ns()
-    method1 = Adam()
-    method2 = GD()
-    method3 = NAG()
-    method4 = Momentum()
-    method5 = Golden()
-    mainMethod = method4 # основной метод
+
+
+    method1 = Adam(lr=exp_learning_rate(70))
+    method2 = GD(lr=const_learning_rate(0.001))
+    method3 = NAG(lr=exp_learning_rate(0.001))
+    method4 = Momentum(lr=exp_learning_rate(0.01))
+    method5 = Golden(lr=exp_learning_rate(1))
+    method6 = AdaGrad(lr=exp_learning_rate(10))
+    method7 = RMSProp(lr=exp_learning_rate(10))
+    mainMethod = method2  # основной метод (solver 3,4,5)
 
     solver1 = DogLeg_Met(function=func)
     solver2 = GN_Met(function=func)
@@ -41,20 +42,21 @@ def main():
     solver5 = Stochastic(function=func, method=mainMethod)
     solver6 = BFGS(function=func)
     solver7 = L_BFGS(function=func)
-    mainSolver = solver7 # основной солвер
+    mainSolver = solver6  # основной солвер
 
-    epoch1, iters1 = solver1.recoverCoefs(x, yn, data)
-    computed1 = solver1.get_computed_coefs()
-    divergence1 = solver1.getDivergence()
+    print(initX)
+    epoch, iters = mainSolver.recoverCoefs(x, yn, initX)
+    computed = mainSolver.getComputedCoefficients()
+    divergence = mainSolver.getDivergence()
     time1 = time.time_ns() - st
-    string_func = funcToString(init_coefs)
 
     plt.figure()
     plt.plot(x, y, label="Initial function", linewidth=2)
     plt.plot(x, yn, label="Randomized data", linewidth=2)
-    plt.plot(x, computed1, label="Computed: epoch " + str(epoch1) + "; real_iter " + str(iters1), linewidth=2)
-    plt.plot(x, divergence1, label="Divergence", linewidth=2)
-    plt.title(string_func)
+    plt.plot(x, computed, label="Computed: epoch " + str(epoch)
+                                + "; real_iter " + str(iters), linewidth=2)
+    plt.plot(x, divergence, label="Divergence", linewidth=2)
+    plt.title(funcToString(init_coefs))
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.grid()
@@ -66,7 +68,8 @@ def main():
     print("Инит")
     print(init_coefs)
     print("Полученные коэффициенты")
-    print(solver1.coefficients)
+    print(mainSolver.coefficients)
+
 
 if __name__ == "__main__":
     main()

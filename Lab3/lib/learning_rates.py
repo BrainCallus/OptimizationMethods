@@ -2,11 +2,13 @@ import math
 from abc import ABC, abstractmethod
 
 class learning_rate(ABC):
-    def __init__(self, numb):
+    def __init__(self, numb,
+                 min_value: float = 0.001,
+                 decay: float = 0.05):
         self.value = numb
         self.initial_rate = numb
-        self.decay = 0.05
-        self.min_value = 0.001
+        self.decay = decay
+        self.min_value = min_value
 
     def restart(self):
         self.value = self.initial_rate
