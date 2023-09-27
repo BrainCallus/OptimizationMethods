@@ -11,11 +11,11 @@ from OptimizationMethods.Lab3.visual import *
 
 # Настройки данных
 def func(x, coeff):
-    return np.asarray(coeff[0] * log(x) + coeff[1] * cos(x))
+    return np.asarray(coeff[0] * log(x) + coeff[1] * cos(x) + coeff[2] * sin(x) - coeff[3] * cos(x)**2)
 
 NOISE = 10
 DATA_SIZE = 100
-init_coefs = [-33, 22]
+init_coefs = [-33, 22, 100, -150]
 x = np.arange(1, 1 + DATA_SIZE)
 y = func(x, init_coefs)
 yn = y + NOISE * np.random.randn(DATA_SIZE)
@@ -30,7 +30,7 @@ def main():
     method5 = Golden(lr=exp_learning_rate(1))
     method6 = AdaGrad(lr=exp_learning_rate(10))
     method7 = RMSProp(lr=exp_learning_rate(10))
-    mainMethod = method7  # основной метод (solver 3,4,5)
+    mainMethod = method1  # основной метод (solver 3,4,5)
 
     solver1 = DogLeg_Met(function=func)
     solver2 = GN_Met(function=func)
@@ -39,7 +39,7 @@ def main():
     solver5 = Stochastic(function=func, method=mainMethod)
     solver6 = BFGS(function=func)
     solver7 = L_BFGS(function=func)
-    mainSolver = solver5  # основной солвер
+    mainSolver = solver7  # основной солвер
 
     print(initX)
     epoch, iters = mainSolver.recoverCoefs(x, yn, initX)
