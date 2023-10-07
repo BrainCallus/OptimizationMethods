@@ -1,8 +1,8 @@
 import time
+import tracemalloc
 
 import numpy as np
 
-from OptimizationMethods.Lab2.execute_lib.graphics import draw_regression
 from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
 from OptimizationMethods.Lab2.lib.functions_and_gradients import *
 from OptimizationMethods.Lab2.lib.polynom_function import polynom
@@ -14,12 +14,13 @@ from OptimizationMethods.Lab2.lib.learning_rates import *
 def do_several_tests_batch_size(n, *args):
     res = []
     for i in range(n):
-        print(i) # номер теста
+        print(i)  # номер теста
         time_start = time.time_ns() / 10 ** 6
         res.append(batch_size_test(*args))
         time_finish = time.time_ns() / 10 ** 6
-        print(time_finish - time_start) # затраченное время
+        print(time_finish - time_start)  # затраченное время
     return np.mean(np.asarray(res), axis=0)
+
 
 def do_several_tests_with_consts(test_func, n, *args):
     if n == 0: return None
@@ -91,12 +92,14 @@ def regularization_test_generate(method):
     # res = [np.mean(i) for i in (np.abs(res / real_value))]
     return np.dstack((regs, res))[0]
 
+
 def arithmetics_test(function, start, *methods):
     res = []
     for method in methods:
         iter, points = method.execute(start, function)
         res.append([method.name, iter * method.math_operations])
     return res
+
 
 def time_test(function, start, names, *methods):
     res = []
@@ -112,8 +115,9 @@ def time_test(function, start, names, *methods):
         i += 1
     return res
 
+
 def batch_size_test(method, start, finish, step, data_size):
-    if start <= 0 or start >= finish or finish > data_size : return None
+    if start <= 0 or start >= finish or finish > data_size: return None
 
     start_point = [np.random.uniform(-10, 10), np.random.uniform(-10, 10)]
     real = [np.random.uniform(5, 10), np.random.uniform(5, 10)]
@@ -140,4 +144,20 @@ def batch_size_test(method, start, finish, step, data_size):
         t = time_finish - time_start
         print(i, iterations, r, t)
         res.append([i, t])
+    return res
+
+
+def memory_test(function, start, names, *methods):
+    res = []
+    i = 0
+    tracemalloc.start()
+    for method in methods:
+        tracemalloc.clear_traces()
+        method.execute(start, function)
+        memory_used_kb = tracemalloc.get_traced_memory()[1] / 1024
+        if names is None:
+            res.append([method.name, memory_used_kb])
+        else:
+            res.append([names[i], memory_used_kb])
+        i += 1
     return res
