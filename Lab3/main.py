@@ -1,4 +1,5 @@
 import time
+import tracemalloc
 
 import numpy as np
 from numpy import cos, sin, log
@@ -11,7 +12,8 @@ from OptimizationMethods.Lab3.visual import *
 
 # Настройки данных
 def func(x, coeff):
-    return np.asarray(coeff[0] * log(x) + coeff[1] * cos(x) + coeff[2] * sin(x) - coeff[3] * cos(x)**2)
+    return np.asarray(coeff[0] * log(x) + coeff[1] * cos(x) + coeff[2] * sin(x) - coeff[3] * cos(x) ** 2)
+
 
 NOISE = 10
 DATA_SIZE = 100
@@ -20,6 +22,8 @@ x = np.arange(1, 1 + DATA_SIZE)
 y = func(x, init_coefs)
 yn = y + NOISE * np.random.randn(DATA_SIZE)
 initX = 10 * np.random.random(len(init_coefs))
+
+
 def main():
     st = time.time_ns()
 
@@ -42,13 +46,17 @@ def main():
     mainSolver = solver7  # основной солвер
 
     print(initX)
+    tracemalloc.start()
     epoch, iters = mainSolver.recoverCoefs(x, yn, initX)
+    mem = tracemalloc.get_traced_memory()
     time1 = time.time_ns() - st
 
     cool_visual(x, yn, func, mainSolver, init_coefs)
 
     print("Time")
     print(time1 / 1000000000)
+    print("Memory")
+    print(str(mem[1] / 1024) + " Kb")
     print("Epoch / iters")
     print(epoch, "/", iters)
     print("Initial")
