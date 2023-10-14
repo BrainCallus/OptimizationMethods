@@ -1,7 +1,7 @@
-from OptimizationMethods.Lab2.lib.methods import *
-from OptimizationMethods.Lab2.execute_lib.graphics import *
-from OptimizationMethods.Lab2.execute_lib.tests import *
-from OptimizationMethods.Lab2.execute_lib.vis_normalization import *
+from Lab2.lib.methods import *
+from Lab2.execute_lib.graphics import *
+from Lab2.execute_lib.tests import *
+from Lab2.execute_lib.vis_normalization import *
 
 lr = const_learning_rate(15)
 method = Adam(lr=lr)

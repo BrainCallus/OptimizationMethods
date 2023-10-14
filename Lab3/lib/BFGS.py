@@ -1,11 +1,12 @@
 import math
+
 from abc import ABC, abstractmethod
 from typing import Callable
 import numpy as np
 
 from OptimizationMethods.Lab3.lib.absRegression import absRegression
 from OptimizationMethods.Lab3.lib.errors_functions import quadratic_error_func
-from OptimizationMethods.Lab3.lib.functions import MiniBatchGD
+from OptimizationMethods.Lab3.lib.functions import *
 
 
 class absBFGS(absRegression, ABC):
@@ -61,6 +62,7 @@ class BFGS(absBFGS):
         H = np.eye(dim)
         I = np.eye(dim)
         nabl = (self.func.grad(self.coefficients))
+        c = 1e-5
         delta = 100
         while delta > self.eps and i < self.max_iter:
             p = -H @ nabl
@@ -70,9 +72,7 @@ class BFGS(absBFGS):
             new_nabl = self.func.grad(self.coefficients)
             y = new_nabl - nabl
             p = y @ s
-            if np.linalg.norm(p) == 0:
-                break
-            ro = 1.0 / p
+            ro = 1.0 / (p + c)
             A1 = I - ro * s[:, np.newaxis] * y[np.newaxis, :]
             A2 = I - ro * y[:, np.newaxis] * s[np.newaxis, :]
             H = A1 @ (H @ A2) + (ro * s[:, np.newaxis] * s[np.newaxis, :])
@@ -85,41 +85,45 @@ class BFGS(absBFGS):
 class L_BFGS(absBFGS):
     def __init__(self,
                  function: Callable,
-                 queue_size: int = 50):
+                 queue_size: int = 20):
         super().__init__(function)
         self.queue_sz = queue_size
 
     def execute(self):
-        queue_alpha = [self.eps]
+        c = 10 ** (-5)
         dim = len(self.coefficients)
+        H = np.eye(dim)
+        I = np.eye(dim)
         i = 1
-        a = 0.1
         gg = [10]
         dd = [10]
-        c1 = 10 ** (-3)
-        s = np.array([a for _ in range(dim)])
-        y = np.array([a for _ in range(dim)])
-        rho = 1 / (s @ y)
-        queue_s_y_rho = [[s, y, rho]]
-
         nabl = self.func.grad(self.coefficients)
-        grad_prev = nabl
+        s = self.coefficients.copy()
+        y = nabl.copy()
+        rho = (1.0 / (s @ y + c))
+        grad_prev = nabl.copy()
+        queue_s_y_rho = [[s, y, rho]]
+        queue_alpha = [100]
+        self.max_iter = 25
 
-        while np.linalg.norm(dd) > self.eps and i < self.max_iter:
+
+        while True and i < self.max_iter:
             q = nabl.copy()
             for j in range(len(queue_s_y_rho)):
                 s, y, rho = queue_s_y_rho[j]
-                alpha = s @ q * rho
+                alpha = rho * s @ q
+                queue_alpha[j] = alpha
                 q -= y * alpha
 
-            s, y, _ = queue_s_y_rho[-1]
-            gamma = (s @ y) / ((y @ y) + c1)
-            r = q * gamma
+            s, y, rho = queue_s_y_rho[-1]
+            gamma = (s.T @ y) / (y.T @ y)
+            H = gamma * I
+            r = H @ q
 
-            for j in range(len(queue_s_y_rho) - 1, -1, -1):
+            for j in range(len(queue_s_y_rho)-1, -1, -1):
                 s, y, rho = queue_s_y_rho[j]
                 alpha = queue_alpha[j]
-                betta = rho * np.dot(y, r)
+                betta = rho * y.T @ r
                 r += s * (alpha - betta)
 
             if len(queue_s_y_rho) == self.queue_sz:
@@ -131,10 +135,9 @@ class L_BFGS(absBFGS):
             self.coefficients -= dd
             nabl = self.func.grad(self.coefficients)
             gg = nabl - grad_prev
-            grad_prev = nabl
-            queue_s_y_rho.append([dd, gg, 1.0 / (np.dot(y, s) + self.eps * 10 ** (-3))])
-            queue_alpha.append(alf)
+            grad_prev = nabl.copy()
+            s, y, rho = queue_s_y_rho[-1]
+            queue_s_y_rho.append([dd, gg, 1.0 / (y @ s)])
+            queue_alpha.append(0)
             i += 1
-
-        print(nabl, gg, dd)
         return i

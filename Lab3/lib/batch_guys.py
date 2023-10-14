@@ -36,6 +36,7 @@ class GDRegression(absRegression):
         self.func = self.type(lambda a, b: quadratic_error_func(a, self.function, b),
                               lambda a, b: self.grad(quadratic_error_func, a, self.function, b),
                               np.dstack((x, y))[0], *self.type_args())
+        self.coefficients = init_data
         i, result = self.method.simple_execute(init_data, self.func)
         self.coefficients = result[0]
         return i, i

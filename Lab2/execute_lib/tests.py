@@ -2,13 +2,13 @@ import time
 
 import numpy as np
 
-from OptimizationMethods.Lab2.execute_lib.graphics import draw_regression
-from OptimizationMethods.Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.lib.polynom_function import polynom
-from OptimizationMethods.Lab2.execute_lib.regression_generation import generate_descent_polynom
-from OptimizationMethods.Lab2.lib.regularization import *
-from OptimizationMethods.Lab2.lib.learning_rates import *
+from Lab2.execute_lib.graphics import draw_regression
+from Lab2.lib.errors_functions import quadratic_error_func, quadratic_error_func_grad
+from Lab2.lib.functions_and_gradients import *
+from Lab2.lib.polynom_function import polynom
+from Lab2.execute_lib.regression_generation import generate_descent_polynom
+from Lab2.lib.regularization import *
+from Lab2.lib.learning_rates import *
 
 
 def do_several_tests_batch_size(n, *args):

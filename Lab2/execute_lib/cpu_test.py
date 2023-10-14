@@ -1,7 +1,7 @@
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.lib.learning_rates import *
-from OptimizationMethods.Lab2.lib.methods import *
-from OptimizationMethods.Lab2.lib.regularization import *
+from Lab2.lib.functions_and_gradients import *
+from Lab2.lib.learning_rates import *
+from Lab2.lib.methods import *
+from Lab2.lib.regularization import *
 
 import sys
 

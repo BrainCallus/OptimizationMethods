@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import LinearLocator
 
-from OptimizationMethods.Lab2.execute_lib.help_functions import *
+from Lab2.execute_lib.help_functions import *
 
 
 def draw_regression(method, function, start, data, data_real, init_coefs, title=False):

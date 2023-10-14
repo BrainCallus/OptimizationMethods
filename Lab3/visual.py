@@ -15,13 +15,13 @@ def funcToString(init_coefs):
 def cool_visual(x, yn, func, solver, init_coefs):
     computed = solver.getComputedCoefficients()
     divergence = solver.getDivergence()
-
+    
     y = func(x, init_coefs)
     plt.figure()
     plt.plot(x, y, label="Initial function", linewidth=2)
     plt.plot(x, yn, label="Randomized data", linewidth=2)
     plt.plot(x, computed, label="Computed")
-    plt.plot(x, divergence, label="Divergence", linewidth=2)
+    # plt.plot(x, divergence, label="Divergence", linewidth=2)
     plt.title(funcToString(init_coefs))
     plt.xlabel("X")
     plt.ylabel("Y")

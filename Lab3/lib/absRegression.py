@@ -35,6 +35,9 @@ class absRegression(ABC):
 
     def getComputedCoefficients(self) -> np.ndarray:
         return self.function(self.x, self.coefficients)
+    
+    def getResult(self) -> list:
+        return self.coefficients
 
     def grad(self, func, *args):
         delta = np.cbrt(np.finfo(float).eps)

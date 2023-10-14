@@ -1,11 +1,11 @@
-from OptimizationMethods.Lab2.lib.methods import *
-from OptimizationMethods.Lab2.lib.learning_rates import *
-from OptimizationMethods.Lab2.lib.functions_and_gradients import *
-from OptimizationMethods.Lab2.lib.polynom_function import polynom
-from OptimizationMethods.Lab2.execute_lib.graphics import *
-from OptimizationMethods.Lab2.lib.errors_functions import *
-from OptimizationMethods.Lab2.execute_lib.regression_generation import *
-from OptimizationMethods.Lab2.lib.regularization import *
+from Lab2.lib.methods import *
+from Lab2.lib.learning_rates import *
+from Lab2.lib.functions_and_gradients import *
+from Lab2.lib.polynom_function import polynom
+from Lab2.execute_lib.graphics import *
+from Lab2.lib.errors_functions import *
+from Lab2.execute_lib.regression_generation import *
+from Lab2.lib.regularization import *
 
 reg = Elastic
 
