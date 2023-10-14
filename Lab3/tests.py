@@ -2,7 +2,7 @@ import time
 import tracemalloc
 import numpy as np
 
-from OptimizationMethods.Lab3.lib.absRegression import absRegression
+from Lab3.lib.absRegression import absRegression
 
 # test_function
 def time_test(

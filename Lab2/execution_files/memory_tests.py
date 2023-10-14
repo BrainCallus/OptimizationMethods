@@ -1,10 +1,10 @@
-from Lab2.execute_lib.excel import *
-from Lab2.execute_lib.tests import *
-from Lab2.execute_lib.graphics import *
-from Lab2.lib.functions_and_gradients import *
-from Lab2.lib.learning_rates import *
-from Lab2.lib.methods import *
-from Lab2.lib.regularization import *
+from OptimizationMethods.Lab2.execute_lib.excel import *
+from OptimizationMethods.Lab2.execute_lib.tests import *
+from OptimizationMethods.Lab2.execute_lib.graphics import *
+from OptimizationMethods.Lab2.lib.functions_and_gradients import *
+from OptimizationMethods.Lab2.lib.learning_rates import *
+from OptimizationMethods.Lab2.lib.methods import *
+from OptimizationMethods.Lab2.lib.regularization import *
 
 reg = NoRegularization()
 
@@ -41,18 +41,19 @@ func = lambda x: x[0] ** 2 + 9 * x[1] ** 2 + 5
 grad = lambda x: [2 * x[0], 18 * x[1]]
 function = Function(func, grad, title="$x^2 + 9y^2 + 5$")
 
-test_count = 100
+testset_size = 100
 # res = do_several_tests_with_consts(time_test, test_count, function, gd, momentum, nag, ada_grad, rms_prop, adam)
 
 names = ['NoRegularization', 'L1', 'L2', 'Elastic']
-res = do_several_tests_with_consts(time_test, test_count, function, start, names, method1, method2, method3, method4)
+res = do_several_tests_with_consts(memory_test, testset_size, function, start, names, method1, method2, method3,
+                                   method4)
 
 show_tests_graph(res, plot_type="hist",
-                 title="Working time of different regularization",
-                 xy_names=["Regularization", "milliseconds"],
-                 plot_comment="average of " + str(test_count) + " tests")
+                 title="Memory usage of different regularization",
+                 xy_names=["Regularization", "Kb"],
+                 plot_comment="average of " + str(testset_size) + " tests")
 
-test_name = "time_methods"
+test_name = "memory_methods"
 make_excel_table(res, "./../tables/" + test_name + ".xlsx")
 
 # OptimizationMethods/Lab2/execution_files/regularization_test.py

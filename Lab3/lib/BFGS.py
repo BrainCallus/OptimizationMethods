@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from typing import Callable
 import numpy as np
 
-from OptimizationMethods.Lab3.lib.absRegression import absRegression
-from OptimizationMethods.Lab3.lib.errors_functions import quadratic_error_func
-from OptimizationMethods.Lab3.lib.functions import *
+from Lab3.lib.absRegression import absRegression
+from Lab3.lib.errors_functions import quadratic_error_func
+from Lab3.lib.functions import *
 
 
 class absBFGS(absRegression, ABC):

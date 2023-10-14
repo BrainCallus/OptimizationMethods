@@ -1,7 +1,7 @@
 import math
 import numpy as np
-from OptimizationMethods.Lab3.lib.learning_rates import learning_rate, const_learning_rate
-from OptimizationMethods.Lab3.lib.regs import NoRegularization, Regularization
+from Lab3.lib.learning_rates import learning_rate, const_learning_rate
+from Lab3.lib.regs import NoRegularization, Regularization
 from abc import ABC, abstractmethod
 
 
