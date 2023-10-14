@@ -21,99 +21,118 @@ def rand_func(dim: int = 4):
     return ff
 
 # mult_test_function
-def mult_test_data_size(
-        solvers: list,
-        test_function,
-        params: list,
-        test_number_for_iteration: int = 100,
-        noise_init: int = 10,
-        noise_real: int = 100,
-        noise: int = 10,
-        dimensions: int = 4
-):
-    res = [0 for _ in params]
-    real = noise_real * np.random.random(dimensions)
-    ff = rand_func(dimensions)
-    for solv in solvers:
-        solv.function = ff
+class mult_test_data_size:
 
-    for i in range(len(params)):
-        res[i] = mult_tests_diff_data(
-            solvers,
+    test_name = "data size"
+
+    ax_name = "data size"
+
+    def exec(
+            solvers: list,
             test_function,
-            ff,
-            real,
-            test_number_for_iteration,
-            params[i],
-            noise,
-            noise_init,
-            False
-        )
-    return res
-
-# mult_test_function
-def mult_test_noise(
-        solvers: list,
-        test_function,
-        params: list,
-        test_number_for_iteration: int = 100,
-        noise_init: int = 10,
-        noise_real: int = 100,
-        data_size: int = 100,
-        dimensions = 4
-):
-    res = [0 for _ in params]
-    real = noise_real * np.random.random(dimensions)
-    ff = rand_func(dimensions)
-    for solv in solvers:
-        solv.function = ff
-
-    for i in range(len(params)):
-        res[i] = mult_tests_diff_data(
-            solvers,
-            test_function,
-            ff,
-            real,
-            test_number_for_iteration,
-            data_size,
-            params[i],
-            noise_init,
-            False
-        )
-    return res
-
-# mult_test_function
-def mult_test_dimensions(
-        solvers: list,
-        test_function,
-        params: list,
-        test_number_for_iteration: int = 100,
-        noise_init: int = 10,
-        noise_real: int = 100,
-        noise: int = 10,
-        data_size: int = 100
-):
-    res = [0 for _ in params]
-
-    for i in range(len(params)):
-        real = noise_real * np.random.random(params[i])
-        ff = rand_func(params[i])
+            params: list,
+            test_number_for_iteration: int = 100,
+            noise_init: int = 10,
+            noise_real: int = 100,
+            noise: int = 10,
+            dimensions: int = 4
+    ):
+        res = [0 for _ in params]
+        real = noise_real * np.random.random(dimensions)
+        ff = rand_func(dimensions)
         for solv in solvers:
             solv.function = ff
 
-        res[i] = mult_tests_diff_data(
-            solvers,
-            test_function,
-            ff,
-            real,
-            test_number_for_iteration,
-            data_size,
-            noise,
-            noise_init,
-            False
-        )
+        for i in range(len(params)):
+            res[i] = mult_tests_diff_data(
+                solvers,
+                test_function,
+                ff,
+                real,
+                test_number_for_iteration,
+                params[i],
+                noise,
+                noise_init,
+                False
+            )
+        return res
 
-    return res
+
+# mult_test_function
+class mult_test_noise:
+
+    test_name = "noise of data"
+
+    ax_name = "noise"
+
+    def exec(
+            solvers: list,
+            test_function,
+            params: list,
+            test_number_for_iteration: int = 100,
+            noise_init: int = 10,
+            noise_real: int = 100,
+            data_size: int = 100,
+            dimensions = 4
+    ):
+        res = [0 for _ in params]
+        real = noise_real * np.random.random(dimensions)
+        ff = rand_func(dimensions)
+        for solv in solvers:
+            solv.function = ff
+
+        for i in range(len(params)):
+            res[i] += mult_tests_diff_data(
+                solvers,
+                test_function,
+                ff,
+                real,
+                test_number_for_iteration,
+                data_size,
+                params[i],
+                noise_init,
+                False
+            )
+        return res
+
+# mult_test_function
+class mult_test_dimensions:
+
+    test_name = "dimensions of x"
+
+    ax_name = "dimensions number"
+
+    def exec(
+            solvers: list,
+            test_function,
+            params: list,
+            test_number_for_iteration: int = 100,
+            noise_init: int = 10,
+            noise_real: int = 100,
+            noise: int = 10,
+            data_size: int = 100
+    ):
+        res = [0 for _ in params]
+
+        for i in range(len(params)):
+            real = noise_real * np.random.random(params[i])
+            ff = rand_func(params[i])
+            for solv in solvers:
+                solv.function = ff
+
+            res[i] = mult_tests_diff_data(
+                solvers,
+                test_function,
+                ff,
+                real,
+                test_number_for_iteration,
+                data_size,
+                noise,
+                noise_init,
+                False
+            )
+
+        return res
 
 def mult_tests_visuals(
         solvers: list,
@@ -127,7 +146,7 @@ def mult_tests_visuals(
         data_size: int = 100,
 
 ):
-    res = mult_test_function(
+    res = mult_test_function.exec(
         solvers,
         test_function,
         params,
@@ -139,8 +158,12 @@ def mult_tests_visuals(
     
     
     ax = plt.subplot()
+    ax.title.set_text("Results of " + test_function.test_name + \
+    " using different " + mult_test_function.test_name)
     for i in range(len(solvers)):
         ax.plot(params, [k[i] for k in res], "-", label=names[i])
+    ax.set_xlabel(mult_test_function.ax_name)
+    ax.set_ylabel(test_function.ax_name)
     ax.legend(prop='monospace')
     plt.show()
 
@@ -184,7 +207,7 @@ def mult_tests(
             y = func(x, real)
             yn = y + noise * np.random.randn(data_size)
         for i in range(len(solvers)):
-            res[i] += test_function(solvers[i], init, x, yn, real)
+            res[i] += test_function.exec(solvers[i], init, x, yn, real)
     
     if console:
         print("Average result of", test_number, "tests:")

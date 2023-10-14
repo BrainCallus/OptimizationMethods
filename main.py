@@ -22,7 +22,7 @@ def main():
     method5 = Golden()
     method6 = AdaGrad(lr=const_learning_rate(100), max_iter=1000)
     method7 = RMSProp(lr=exp_learning_rate(10))
-    mainMethod = method6  # основной метод (solver 3,4,5)
+    mainMethod = method7  # основной метод (solver 3,4,5)
 
     solver1 = DogLeg_Met(function=func)
     solver2 = GN_Met(function=func)
@@ -33,16 +33,26 @@ def main():
     solver7 = L_BFGS(function=func)
     mainSolver = solver5 # основной солвер
 
-    solversTeam = [solver1]
+    solversTeam = [solver1, solver2]
 
     mult_tests_visuals(
         solversTeam, 
-        memory_test, 
+        result_norm_test, 
         mult_test_noise, 
-        [i + 1 for i in range(50)], 
-        ["DogLeg"],
+        [i + 1 for i in range(100)],
+        ["DogLeg", "GN"],
         test_number_for_iteration=10
         )
+
+    mult_tests_visuals(
+        solversTeam, 
+        result_norm_test, 
+        mult_test_data_size, 
+        [(i + 1) * 500 for i in range(10)],
+        ["DogLeg", "GN"],
+        test_number_for_iteration=100
+        )
+
 
 if __name__ == "__main__":
     main()

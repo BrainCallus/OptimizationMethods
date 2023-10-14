@@ -34,7 +34,7 @@ class absNewton(absRegression):
         y0 = self.computeDivergence(x0)
         jacobian = []
         sub_iter = 0
-        for i, parameter in enumerate(x0):
+        for i, _ in enumerate(x0):
             sub_iter += 1
             x = x0.copy()
             x[i] += step
