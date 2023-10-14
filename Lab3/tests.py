@@ -39,3 +39,14 @@ def memory_test(
     tracemalloc.start()
     solver.recoverCoefs(x, y, initX)
     return tracemalloc.get_traced_memory()[1] / 1024
+
+# test_function
+def iter_test(
+        solver: absRegression,
+        initX: np.ndarray,
+        x: np.ndarray,
+        y: np.ndarray,
+        real: np.ndarray = None
+) -> float:
+    _, iter = solver.recoverCoefs(x, y, initX)
+    return iter
