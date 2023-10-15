@@ -1,5 +1,7 @@
 import numpy as np
+
 np.set_printoptions(precision=4)
+import tracemalloc
 from numpy import cos, sin, log
 
 from Lab3.lib.BFGS import *
@@ -26,39 +28,44 @@ def main():
     solver5 = Stochastic(method=mainMethod)
     solver6 = BFGS()
     solver7 = L_BFGS()
-    mainSolver = solver1 # основной солвер
+    mainSolver = solver7  # основной солвер
 
-    solversTeam = [
-        solver2,
-        Stochastic(method=method1),
-        Stochastic(method=method2),
-        Stochastic(method=method3),
-        Stochastic(method=method4),
-        Stochastic(method=method5),
-        Stochastic(method=method6),
-        Stochastic(method=method7)
-        ]
-
-    names = [
-        "Newton-Gauss",
-        "Adam",
-        "Gradient descent",
-        "Nesterov",
-        "Momentum",
-        "Golden",
-        "Adagrad",
-        "RMSProp"
-    ]
+    solversTeam = [solver1, solver2]
 
     mult_tests_visuals(
     solversTeam, 
     result_norm_test, 
     mult_test_noise, 
-    [10*(i + 1) for i in range(5)],
-    names,
-    test_number_for_iteration=100,
-    data_size=10
+    [i + 1 for i in range(10)],
+    ["DogLeg", "GN"],
+    test_number_for_iteration=10
     )
+
+    st = time.time_ns()
+    mem = cool_visual(solver7, data_size=100)
+    print("Время выполнения LBfgs:")
+    print((time.time_ns() - st) / 10 ** 9)
+    print("Mem выполнения LBfgs:")
+    print(mem)
+    print()
+
+    func, real, init = generate_random_func_and_params(noise_init=3, noise_real=10)
+    st = time.time_ns()
+    mem = cool_visual_determined_func(mainSolver, func, real, init, data_size=100)
+    print("Время выполнения Lbfgs:")
+    print((time.time_ns() - st) / 10 ** 9)
+    print("Mem выполнения Lbfgs:")
+    print(mem)
+    print()
+
+    st = time.time_ns()
+    mem = cool_visual_determined_func(solver6, func, real, init, data_size=100)
+    print("Время выполнения Bfgs:")
+    print((time.time_ns() - st) / 10 ** 9)
+    print("Mem выполнения Bfgs:")
+    print(mem)
+    print()
+
 
 if __name__ == "__main__":
     main()

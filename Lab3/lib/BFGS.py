@@ -1,8 +1,5 @@
 import math
 
-from abc import ABC, abstractmethod
-from typing import Callable
-import numpy as np
 
 from Lab3.lib.absRegression import absRegression
 from Lab3.lib.errors_functions import quadratic_error_func
@@ -40,8 +37,8 @@ class absBFGS(absRegression, ABC):
         new_x = x + alf * p
         new_nabl = self.func.grad(new_x)
         f_new_x = self.func.func(new_x)
-        while (f_new_x > fx + (c1 * alf * nabl.T @ p)
-               or math.fabs(new_nabl.T @ p) > c2 * math.fabs(nabl.T @ p) and f_new_x != fx):
+        while ((f_new_x > fx + (c1 * alf * nabl.T @ p)
+                or math.fabs(new_nabl.T @ p) > c2 * math.fabs(nabl.T @ p)) and abs(f_new_x - fx) >= 1e-8):
             alf *= 0.5
             new_x = x + alf * p
             f_new_x = self.func.func(new_x)
@@ -54,8 +51,7 @@ class absBFGS(absRegression, ABC):
 
 
 class BFGS(absBFGS):
-    def __init__(self,
-                 max_iter: int = 100):
+    def __init__(self, max_iter: int = 100):
         self.type = MiniBatchGD
         self.type_args = lambda: [80]
         self.eps = 1e-3
@@ -84,64 +80,24 @@ class BFGS(absBFGS):
             delta = np.linalg.norm(nabl - new_nabl)
             nabl = new_nabl
             i += 1
+        print(self.coefficients)
         return i
 
 
 class L_BFGS(absBFGS):
-    def __init__(self,
-                 max_iter: int = 100,
-                 queue_size: int = 20):
+    def __init__(self, max_iter: int = 100, queue_size: int = 15):
         self.queue_sz = queue_size
         self.type = MiniBatchGD
         self.type_args = lambda: [50]
-        self.eps = 1e-3
+        self.eps = 1e-4
         self.max_iter = max_iter
 
     def execute(self):
-        class node:
-            def __init__(this, s, y, rho, alpha):
-                this.s = s
-                this.y = y
-                this.rho = rho
-                this.alpha = alpha
-                this.next = None
-                this.prev = None
-
-        class linked_list:
-            def __init__(this):
-                this.max_size = self.queue_sz
-                this.first = None
-                this.last = None
-                this.size = 0
-            
-            def insert(this, s, y, rho, alpha):
-                n = node(s, y, rho, alpha)
-                if this.size == 0:
-                    this.size = 1
-                    this.first = n
-                    this.last = n
-                elif this.size == 1:
-                    this.size = 2
-                    this.first = n
-                    this.first.next = this.last
-                    this.last.prev = this.first
-                elif this.size != this.max_size:
-                    this.size += 1
-                    this.first.prev = n
-                    n.next = this.first
-                    this.first = n
-                else:
-                    this.first.prev = n
-                    n.next = this.first
-                    this.first = n
-                    this.last = this.last.prev
-                    this.last.next = None
-
-        main_list = linked_list()
+        main_list = LinkedList(self.queue_sz)
         i = 1
         grad = self.func.grad(self.coefficients)
-        xPrev = np.zeros(len(self.coefficients))
-        gradPrev = grad - grad
+        x_prev = np.zeros(len(self.coefficients))
+        grad_prev = grad - grad
         ys = 100
         c = 1e-9
 
@@ -149,12 +105,12 @@ class L_BFGS(absBFGS):
             q = self.func.grad(grad)
 
             nnode = main_list.last
-            while nnode != None:
+            while nnode is not None:
                 al = (np.dot(nnode.s, q) * nnode.rho)
                 nnode.alpha = al
                 q -= al * nnode.y
                 nnode = nnode.prev
-            
+
             gamma = 1.0
             if main_list.size != 0:
                 nnode = main_list.first
@@ -163,7 +119,7 @@ class L_BFGS(absBFGS):
             r = q * gamma
 
             nnode = main_list.first
-            while nnode != None:
+            while nnode is not None:
                 r += nnode.s * (nnode.alpha - nnode.rho * np.dot(nnode.y, r))
                 nnode = nnode.next
 
@@ -172,15 +128,56 @@ class L_BFGS(absBFGS):
             grad = self.func.grad(self.coefficients)
 
             if main_list.size != 0:
-                main_list.insert(self.coefficients - xPrev, grad - gradPrev, 
-                                 1.0 / (np.dot(main_list.first.y, main_list.first.s) + c), 
+                main_list.insert(self.coefficients - x_prev, grad - grad_prev,
+                                 1.0 / (np.dot(main_list.first.y, main_list.first.s) + c),
                                  alf)
             else:
-                main_list.insert(self.coefficients - xPrev, grad - gradPrev, 1e-3, alf)
+                main_list.insert(self.coefficients - x_prev, grad - grad_prev, 1e-3, alf)
 
-            xPrev = self.coefficients
-            gradPrev = grad
+            x_prev = self.coefficients
+            grad_prev = grad
             i += 1
-            print(i, ys, main_list.first.s, self.coefficients, xPrev)
-                
+        # print(i, ys, main_list.first.s, self.coefficients, xPrev)
+        print(self.coefficients)
         return i
+
+
+class Node:
+    def __init__(self, s, y, rho, alpha):
+        self.s = s
+        self.y = y
+        self.rho = rho
+        self.alpha = alpha
+        self.next = None
+        self.prev = None
+
+
+class LinkedList:
+    def __init__(self, queue_sz):
+        self.max_size = queue_sz
+        self.first = None
+        self.last = None
+        self.size = 0
+
+    def insert(self, s, y, rho, alpha):
+        n = Node(s, y, rho, alpha)
+        if self.size == 0:
+            self.size = 1
+            self.first = n
+            self.last = n
+        elif self.size == 1:
+            self.size = 2
+            self.first = n
+            self.first.next = self.last
+            self.last.prev = self.first
+        elif self.size != self.max_size:
+            self.size += 1
+            self.first.prev = n
+            n.next = self.first
+            self.first = n
+        else:
+            self.first.prev = n
+            n.next = self.first
+            self.first = n
+            self.last = self.last.prev
+            self.last.next = None
