@@ -11,15 +11,13 @@ from Lab3.lib.functions import *
 
 class absBFGS(absRegression, ABC):
     def __init__(self,
-                 function: Callable,
                  eps: float = 10 ** (-3)):
-        super().__init__(function=function, eps=eps)
+        super().__init__(eps=eps)
         self.gradient = None
         self.func = None
         self.coefficients = None
         self.y = None
         self.x = None
-        self.function = function
         self.type = MiniBatchGD
         self.type_args = lambda: [80]
 
@@ -56,13 +54,20 @@ class absBFGS(absRegression, ABC):
 
 
 class BFGS(absBFGS):
+    def __init__(self,
+                 max_iter: int = 100):
+        self.type = MiniBatchGD
+        self.type_args = lambda: [80]
+        self.eps = 1e-3
+        self.max_iter = max_iter
+
     def execute(self):
         i = 1
         dim = len(self.coefficients)
         H = np.eye(dim)
         I = np.eye(dim)
         nabl = (self.func.grad(self.coefficients))
-        c = 1e-5
+        c = 1e-7
         delta = 100
         while delta > self.eps and i < self.max_iter:
             p = -H @ nabl
@@ -84,60 +89,98 @@ class BFGS(absBFGS):
 
 class L_BFGS(absBFGS):
     def __init__(self,
-                 function: Callable,
+                 max_iter: int = 100,
                  queue_size: int = 20):
-        super().__init__(function)
         self.queue_sz = queue_size
+        self.type = MiniBatchGD
+        self.type_args = lambda: [50]
+        self.eps = 1e-3
+        self.max_iter = max_iter
 
     def execute(self):
-        c = 10 ** (-5)
-        dim = len(self.coefficients)
-        H = np.eye(dim)
-        I = np.eye(dim)
+        class node:
+            def __init__(this, s, y, rho, alpha):
+                this.s = s
+                this.y = y
+                this.rho = rho
+                this.alpha = alpha
+                this.next = None
+                this.prev = None
+
+        class linked_list:
+            def __init__(this):
+                this.max_size = self.queue_sz
+                this.first = None
+                this.last = None
+                this.size = 0
+            
+            def insert(this, s, y, rho, alpha):
+                n = node(s, y, rho, alpha)
+                if this.size == 0:
+                    this.size = 1
+                    this.first = n
+                    this.last = n
+                elif this.size == 1:
+                    this.size = 2
+                    this.first = n
+                    this.first.next = this.last
+                    this.last.prev = this.first
+                elif this.size != this.max_size:
+                    this.size += 1
+                    this.first.prev = n
+                    n.next = this.first
+                    this.first = n
+                else:
+                    this.first.prev = n
+                    n.next = this.first
+                    this.first = n
+                    this.last = this.last.prev
+                    this.last.next = None
+
+        main_list = linked_list()
         i = 1
-        gg = [10]
-        dd = [10]
-        nabl = self.func.grad(self.coefficients)
-        s = self.coefficients.copy()
-        y = nabl.copy()
-        rho = (1.0 / (s @ y + c))
-        grad_prev = nabl.copy()
-        queue_s_y_rho = [[s, y, rho]]
-        queue_alpha = [100]
-        self.max_iter = 25
+        grad = self.func.grad(self.coefficients)
+        xPrev = np.zeros(len(self.coefficients))
+        gradPrev = grad - grad
+        ys = 100
+        c = 1e-9
 
+        while np.linalg.norm(ys) > self.eps and i < self.max_iter:
+            q = self.func.grad(grad)
 
-        while True and i < self.max_iter:
-            q = nabl.copy()
-            for j in range(len(queue_s_y_rho)):
-                s, y, rho = queue_s_y_rho[j]
-                alpha = rho * s @ q
-                queue_alpha[j] = alpha
-                q -= y * alpha
+            nnode = main_list.last
+            while nnode != None:
+                al = (np.dot(nnode.s, q) * nnode.rho)
+                nnode.alpha = al
+                q -= al * nnode.y
+                nnode = nnode.prev
+            
+            gamma = 1.0
+            if main_list.size != 0:
+                nnode = main_list.first
+                ys = nnode.y
+                gamma = np.dot(nnode.y, nnode.s) / (np.dot(nnode.y, nnode.y) + c)
+            r = q * gamma
 
-            s, y, rho = queue_s_y_rho[-1]
-            gamma = (s.T @ y) / (y.T @ y)
-            H = gamma * I
-            r = H @ q
-
-            for j in range(len(queue_s_y_rho)-1, -1, -1):
-                s, y, rho = queue_s_y_rho[j]
-                alpha = queue_alpha[j]
-                betta = rho * y.T @ r
-                r += s * (alpha - betta)
-
-            if len(queue_s_y_rho) == self.queue_sz:
-                queue_s_y_rho.pop(0)
-                queue_alpha.pop(0)
+            nnode = main_list.first
+            while nnode != None:
+                r += nnode.s * (nnode.alpha - nnode.rho * np.dot(nnode.y, r))
+                nnode = nnode.next
 
             alf = self.line_search(self.coefficients, -r)
-            dd = r * alf
-            self.coefficients -= dd
-            nabl = self.func.grad(self.coefficients)
-            gg = nabl - grad_prev
-            grad_prev = nabl.copy()
-            s, y, rho = queue_s_y_rho[-1]
-            queue_s_y_rho.append([dd, gg, 1.0 / (y @ s)])
-            queue_alpha.append(0)
+            self.coefficients -= r * alf
+            grad = self.func.grad(self.coefficients)
+
+            if main_list.size != 0:
+                main_list.insert(self.coefficients - xPrev, grad - gradPrev, 
+                                 1.0 / (np.dot(main_list.first.y, main_list.first.s) + c), 
+                                 alf)
+            else:
+                main_list.insert(self.coefficients - xPrev, grad - gradPrev, 1e-3, alf)
+
+            xPrev = self.coefficients
+            gradPrev = grad
             i += 1
+            print(i, ys, main_list.first.s, self.coefficients, xPrev)
+                
         return i
