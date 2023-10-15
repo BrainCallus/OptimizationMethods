@@ -19,13 +19,11 @@ class GDRegression(absRegression):
         ...
 
     def __init__(self,
-                 function: Callable,
                  max_iter: int = 1000,
                  eps: float = 0.001,
                  method: Method = Adam(lr=time_learning_rate(100))):
-        super().__init__(function, max_iter, eps)
+        super().__init__(max_iter, eps)
         self.method = method
-        self.func = None
 
     def recoverCoefs(self,
                      x: np.ndarray,
@@ -51,12 +49,11 @@ class Stochastic(GDRegression):
 
 class MiniBatch(GDRegression):
     def __init__(self,
-                 function: Callable,
                  max_iter: int = 1000,
                  eps: float = 10 ** (-3),
                  method: Method = Adam(lr=time_learning_rate(100)),
                  batch_size=50):
-        super().__init__(function, max_iter, eps, method)
+        super().__init__(max_iter, eps, method)
         self.batch = batch_size
 
     type = MiniBatchGD

@@ -8,10 +8,8 @@ class absRegression(ABC):
     logger = logging.getLogger(__name__)
 
     def __init__(self,
-                 function: Callable,
                  max_iter: int = 1000,
                  eps: float = 10 ** (-3)):
-        self.function = function
         self.max_iter = max_iter
         self.eps = eps
         self.coefficients = None

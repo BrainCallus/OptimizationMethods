@@ -7,7 +7,7 @@ from Lab3.tests import *
 
 def rand_func(dim: int = 4):
     functions = [cos, sin, log]
-    poera = [1, 2, 3, 4, 5]
+    poera = [1, 2]
     f = []
     for _ in range(dim):
         f.append([random.choice(functions), random.choice(poera)])
@@ -19,6 +19,50 @@ def rand_func(dim: int = 4):
         return np.asarray(r)
 
     return ff
+
+def funcToString(init_coefs):
+    return "$ Initial: " + " + ".join([
+        f"{init_coefs[i]:.3f}" +
+        " \cdot x ^{" + str(i) + "}"
+        for i in range(len(init_coefs))]) + "$"
+
+
+def cool_visual(
+        solver: absRegression, 
+        noise_init: int = 10,
+        noise_real: int = 100,
+        noise: int = 10,
+        data_size: int = 100,
+        dimensions: int = 4
+        ):
+        
+
+        func = rand_func(dimensions)
+        real = noise_real * np.random.random(dimensions)
+        init = noise_init * np.random.random(dimensions)
+        x = np.arange(1, 1 + data_size)
+        y = func(x, real)
+        yn = y + noise * np.random.randn(data_size)
+        print(real)
+
+        solver.function = func
+        solver.recoverCoefs(x, yn, init)
+        computed = solver.getComputedCoefficients()
+        divergence = solver.getDivergence()
+
+        
+        y = func(x, real)
+        plt.figure()
+        plt.plot(x, y, label="Initial function", linewidth=2)
+        # plt.plot(x, yn, label="Randomized data", linewidth=2)
+        plt.plot(x, computed, label="Computed")
+        plt.plot(x, divergence, label="Divergence", linewidth=2)
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        plt.grid()
+        plt.legend()
+        plt.show()
+
 
 # mult_test_function
 class mult_test_data_size:

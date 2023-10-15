@@ -8,6 +8,8 @@ from Lab3.lib.absRegression import absRegression
 
 
 class absNewton(absRegression):
+    function = None
+
     def recoverCoefs(self,
                      x: np.ndarray,
                      y: np.ndarray,
@@ -61,11 +63,10 @@ class GN_Met(absNewton):
 
 class DogLeg_Met(absNewton):
     def __init__(self,
-                 function: Callable,
                  max_iter: int = 1000,
                  eps: float = 10 ** (-3),
                  trust_reg: float = 1.0):
-        super().__init__(function, max_iter, eps)
+        super().__init__(max_iter, eps)
         self.trust_reg = trust_reg
 
     def getSigma(self, diverg):
