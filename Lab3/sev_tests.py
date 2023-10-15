@@ -1,9 +1,9 @@
-import numpy as np
 from numpy import log, cos, sin
 import matplotlib.pyplot as plt
 import random
 
 from Lab3.tests import *
+
 
 def rand_func(dim: int = 4):
     functions = [cos, sin, log]
@@ -20,6 +20,7 @@ def rand_func(dim: int = 4):
 
     return ff
 
+
 def funcToString(init_coefs):
     return "$ Initial: " + " + ".join([
         f"{init_coefs[i]:.3f}" +
@@ -27,46 +28,53 @@ def funcToString(init_coefs):
         for i in range(len(init_coefs))]) + "$"
 
 
-def cool_visual(
-        solver: absRegression, 
-        noise_init: int = 10,
-        noise_real: int = 100,
-        noise: int = 10,
-        data_size: int = 100,
-        dimensions: int = 4
-        ):
-        
+def generate_random_func_and_params(noise_init: int = 5, noise_real: int = 5, dimensions: int = 4):
+    func = rand_func(dimensions)
+    real = noise_real * np.random.random(dimensions)
+    init = real + noise_init * np.random.random(dimensions)
+    return func, real, init
 
-        func = rand_func(dimensions)
-        real = noise_real * np.random.random(dimensions)
-        init = noise_init * np.random.random(dimensions)
-        x = np.arange(1, 1 + data_size)
-        y = func(x, real)
-        yn = y + noise * np.random.randn(data_size)
-        print(real)
 
-        solver.function = func
-        solver.recoverCoefs(x, yn, init)
-        computed = solver.getComputedCoefficients()
-        divergence = solver.getDivergence()
+def cool_visual(solver: absRegression, noise_init: int = 5, noise_real: int = 5, noise: int = 5, data_size: int = 100,
+                dimensions: int = 4):
+    func, real, init = generate_random_func_and_params(noise_init, noise_real, dimensions)
+    cool_visual_internal(solver, func, real, init, noise, data_size)
 
-        
-        y = func(x, real)
-        plt.figure()
-        plt.plot(x, y, label="Initial function", linewidth=2)
-        # plt.plot(x, yn, label="Randomized data", linewidth=2)
-        plt.plot(x, computed, label="Computed")
-        plt.plot(x, divergence, label="Divergence", linewidth=2)
-        plt.xlabel("X")
-        plt.ylabel("Y")
-        plt.grid()
-        plt.legend()
-        plt.show()
+
+def cool_visual_determined_func(solver: absRegression, func, real, init, noise: int = 2, data_size: int = 100):
+    cool_visual_internal(solver, func, real, init, noise, data_size)
+
+
+def cool_visual_internal(solver: absRegression, func, real, init, noise: int = 2, data_size: int = 100):
+    x = np.arange(1, 1 + data_size)
+    y = func(x, real)
+    yn = y + noise * np.random.randn(data_size)
+    print(real)
+
+    solver.function = func
+    tracemalloc.start()
+    solver.recoverCoefs(x, yn, init)
+    mem = tracemalloc.get_traced_memory()[1] / 1024
+    tracemalloc.stop()
+    computed = solver.getComputedCoefficients()
+    divergence = solver.getDivergence()
+
+    y = func(x, real)
+    plt.figure()
+    plt.plot(x, y, label="Initial function", linewidth=2)
+    # plt.plot(x, yn, label="Randomized data", linewidth=2)
+    plt.plot(x, computed, label="Computed")
+    plt.plot(x, divergence, label="Divergence", linewidth=2)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.grid()
+    plt.legend()
+    plt.show()
+    return mem
 
 
 # mult_test_function
 class mult_test_data_size:
-
     test_name = "data size"
 
     ax_name = "data size"
@@ -104,7 +112,6 @@ class mult_test_data_size:
 
 # mult_test_function
 class mult_test_noise:
-
     test_name = "noise of data"
 
     ax_name = "noise"
@@ -117,7 +124,7 @@ class mult_test_noise:
             noise_init: int = 10,
             noise_real: int = 100,
             data_size: int = 100,
-            dimensions = 4
+            dimensions=4
     ):
         res = [0 for _ in params]
         real = noise_real * np.random.random(dimensions)
@@ -139,9 +146,9 @@ class mult_test_noise:
             )
         return res
 
+
 # mult_test_function
 class mult_test_dimensions:
-
     test_name = "dimensions of x"
 
     ax_name = "dimensions number"
@@ -178,6 +185,7 @@ class mult_test_dimensions:
 
         return res
 
+
 def mult_tests_visuals(
         solvers: list,
         test_function,
@@ -199,11 +207,10 @@ def mult_tests_visuals(
         noise,
         data_size,
     )
-    
-    
+
     ax = plt.subplot()
     ax.title.set_text("Results of " + test_function.test_name + \
-    " using different " + mult_test_function.test_name)
+                      " using different " + mult_test_function.test_name)
     for i in range(len(solvers)):
         ax.plot(params, [k[i] for k in res], "-", label=names[i])
     ax.set_xlabel(mult_test_function.ax_name)
@@ -224,13 +231,13 @@ def mult_tests(
         noise: int,
         noise_init: int,
         console: bool,
-):  
+):
     if console:
         print("Start of multiple tests.")
         print(prompt)
         print()
         print("Methods name:")
-        for solver in solvers: 
+        for solver in solvers:
             print(solver.__class__.__name__)
         print()
         print("Test name:")
@@ -252,15 +259,16 @@ def mult_tests(
             yn = y + noise * np.random.randn(data_size)
         for i in range(len(solvers)):
             res[i] += test_function.exec(solvers[i], init, x, yn, real)
-    
+
     if console:
         print("Average result of", test_number, "tests:")
-        print(res/test_number)
+        print(res / test_number)
         print("Tests are over")
         print()
         print("-------------------------------------------")
 
     return res / test_number
+
 
 def mult_tests_diff_data(
         solvers: list,
@@ -271,8 +279,7 @@ def mult_tests_diff_data(
         data_size: int = 100,
         noise: int = 10,
         noise_init: int = 10,
-        console: bool = True
-):  
+        console: bool = True):
     return mult_tests(
         solvers,
         test_function,
@@ -287,6 +294,7 @@ def mult_tests_diff_data(
         console
     )
 
+
 def mult_tests_same_data_diff_init(
         solvers: list,
         test_function,
@@ -297,7 +305,7 @@ def mult_tests_same_data_diff_init(
         noise: int = 10,
         noise_init: int = 10,
         console: bool = True
-):  
+):
     return mult_tests(
         solvers,
         test_function,

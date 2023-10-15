@@ -1,5 +1,7 @@
 import numpy as np
+
 np.set_printoptions(precision=4)
+import tracemalloc
 from numpy import cos, sin, log
 
 from Lab3.lib.BFGS import *
@@ -26,7 +28,7 @@ def main():
     solver5 = Stochastic(method=mainMethod)
     solver6 = BFGS()
     solver7 = L_BFGS()
-    mainSolver = solver7 # основной солвер
+    mainSolver = solver7  # основной солвер
 
     solversTeam = [solver1, solver2]
 
@@ -39,11 +41,21 @@ def main():
     # test_number_for_iteration=10
     # )
 
+    func, real, init = generate_random_func_and_params(noise_init=3, noise_real=10)
+    st = time.time_ns()
+    mem = cool_visual_determined_func(mainSolver, func, real, init, data_size=500)
+    print("Время выполнения Lbfgs:")
+    print((time.time_ns() - st) / 10 ** 9)
+    print("Mem выполнения Lbfgs:")
+    print(mem)
+    print()
 
     st = time.time_ns()
-    cool_visual(mainSolver, data_size=5000)
-    print("Время выполнения:")
-    print((time.time_ns() - st) / 10**9)
+    mem = cool_visual_determined_func(solver6, func, real, init, data_size=500)
+    print("Время выполнения Bfgs:")
+    print((time.time_ns() - st) / 10 ** 9)
+    print("Mem выполнения Bfgs:")
+    print(mem)
     print()
 
 
