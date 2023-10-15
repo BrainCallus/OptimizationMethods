@@ -26,26 +26,39 @@ def main():
     solver5 = Stochastic(method=mainMethod)
     solver6 = BFGS()
     solver7 = L_BFGS()
-    mainSolver = solver7 # основной солвер
+    mainSolver = solver1 # основной солвер
 
-    solversTeam = [solver1, solver2]
+    solversTeam = [
+        solver2,
+        Stochastic(method=method1),
+        Stochastic(method=method2),
+        Stochastic(method=method3),
+        Stochastic(method=method4),
+        Stochastic(method=method5),
+        Stochastic(method=method6),
+        Stochastic(method=method7)
+        ]
 
-    # mult_tests_visuals(
-    # solversTeam, 
-    # result_norm_test, 
-    # mult_test_noise, 
-    # [i + 1 for i in range(10)],
-    # ["DogLeg", "GN"],
-    # test_number_for_iteration=10
-    # )
+    names = [
+        "Newton-Gauss",
+        "Adam",
+        "Gradient descent",
+        "Nesterov",
+        "Momentum",
+        "Golden",
+        "Adagrad",
+        "RMSProp"
+    ]
 
-
-    st = time.time_ns()
-    cool_visual(mainSolver, data_size=5000)
-    print("Время выполнения:")
-    print((time.time_ns() - st) / 10**9)
-    print()
-
+    mult_tests_visuals(
+    solversTeam, 
+    result_norm_test, 
+    mult_test_noise, 
+    [10*(i + 1) for i in range(5)],
+    names,
+    test_number_for_iteration=100,
+    data_size=10
+    )
 
 if __name__ == "__main__":
     main()

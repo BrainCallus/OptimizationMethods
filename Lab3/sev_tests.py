@@ -200,7 +200,6 @@ def mult_tests_visuals(
         data_size,
     )
     
-    
     ax = plt.subplot()
     ax.title.set_text("Results of " + test_function.test_name + \
     " using different " + mult_test_function.test_name)
