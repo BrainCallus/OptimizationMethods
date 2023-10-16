@@ -15,7 +15,7 @@ def get_plot_bounds(*point_arrs):
             top_max = max(top_max, p[1])
             bottom_max = min(bottom_max, p[1])
 
-    return left_min-0.5, right_max+0.5, top_max+0.5, bottom_max-0.5
+    return left_min - 0.5, right_max + 0.5, top_max + 0.5, bottom_max - 0.5
 
 
 def make_linspace(*point_arrs):
@@ -29,7 +29,8 @@ def plot_both(x, f, ax, custom_func, torch_func, name):
     X, Y = make_linspace(result_1.result, result_2.result)
     left, right, top, bottom = get_plot_bounds(result_1.result, result_2.result)
     ax.contour(X, Y, f([X, Y]), levels=[f(np.array([p, p])) for p in
-                                        range(1, math.ceil(min(max(abs(left), abs(right), abs(top), abs(bottom)), 20)))])
+                                        range(1,
+                                              math.ceil(min(max(abs(left), abs(right), abs(top), abs(bottom)), 20)))])
     ax.plot(result_1.result[:, 0], result_1.result[:, 1], 'o-')
     ax.plot(result_2.result[:, 0], result_2.result[:, 1], 'o-')
     title = f"{name}\nour {len(result_1.result)} iterations / torch {len(result_2.result)} iterations"
@@ -59,3 +60,29 @@ def plot_both_regr(p, points, ax, my_impl, scipy_impl, name):
         ax.title(title)
     else:
         ax.set_title(title)
+
+
+def draw_hist(named_results, mapper, title):
+    ax = plt.subplot(211)
+    width = 0.8
+    data = list(map(mapper, named_results))
+    bins = list(map(lambda x: x + 1, range(0, len(data))))
+    ax.bar(bins, data, width=width)
+    ax.set_xticks(list(map(lambda x: x, range(1, len(data) + 1))))
+    ax.set_title(title)
+    ax.set_xticklabels(list(map(lambda x: x[0], named_results)), rotation=45, rotation_mode="anchor", ha="right")
+    plt.show()
+
+
+def draw_dependence_graph(parameter_name, mapper, results_by_name, bounds):
+    plt.figure()
+    for item in results_by_name.items():
+        times = list(map(mapper, item[1]))
+        plt.plot(bounds, times, label=item[0])
+
+    plt.title(f'{parameter_name} dependence on bounds')
+    plt.xlabel("bounds")
+    plt.ylabel(f'{parameter_name}')
+    # plt.grid()
+    plt.legend()
+    plt.show()

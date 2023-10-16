@@ -31,7 +31,7 @@ def run_torch_gd(params, f, xt, lim=500):
     return np.array(points)
 
 
-def run_and_return_result(runable):
+def run_and_return_result(runable, loss_func=None):
     start = time.time()
     tracemalloc.start()
     tracemalloc.clear_traces()
@@ -40,7 +40,7 @@ def run_and_return_result(runable):
     tracemalloc.clear_traces()
     tracemalloc.stop()
     time_usage = time.time() - start
-    return RunResult(result, time_usage, memory_usage_kb)
+    return RunResult(result, time_usage, memory_usage_kb, loss_func)
 
 
 def run_cusom_and_torch(x, f, my_impl, torch_impl):
@@ -54,13 +54,19 @@ def run_scipy_method(p, points, method, lim=500):
     return result.x
 
 
-def run_both_regr(p, points, my_impl, scipy_impl):
-    return run_and_return_result(lambda: my_impl(p, points)), run_and_return_result(
-        lambda: run_scipy_method(p, points, scipy_impl))
+def run_both_regr(p, points, my_impl, scipy_impl, loss_func=None):
+    return run_and_return_result(lambda: my_impl(p, points), loss_func), run_and_return_result(
+        lambda: run_scipy_method(p, points, scipy_impl), loss_func)
 
 
 class RunResult:
-    def __init__(self, result, time_usage, memory_usage):
+    def __init__(self, result, time_usage, memory_usage, loss_func=None):
         self.result = result
         self.time_usage = time_usage
         self.memory_usage = memory_usage
+        self.loss = 0 if loss_func is None else loss_func(result)
+
+    def add(self, other):
+        self.time_usage += other.time_usage
+        self.memory_usage += other.memory_usage
+        self.loss += other.loss
