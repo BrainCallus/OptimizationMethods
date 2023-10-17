@@ -58,7 +58,9 @@ class memory_test:
         ) -> float:
                 tracemalloc.start()
                 solver.recoverCoefs(x, y, initX)
-                return tracemalloc.get_traced_memory()[1] / 1024
+                a = tracemalloc.get_traced_memory()[1] / 1024
+                tracemalloc.stop()
+                return a
 
 
 

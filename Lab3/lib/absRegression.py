@@ -42,9 +42,5 @@ class absRegression(ABC):
         dim = len(args[0])
         nabl = np.zeros(dim)
         for i in range(dim):
-            x_first = np.copy(args[0])
-            x_second = np.copy(args[0])
-            x_first[i] += delta
-            x_second[i] -= delta
-            nabl[i] = (func(x_first, *args[1:]) - func(x_second, *args[1:])) / (2 * delta)
+            nabl[i] = (func(args[0] + delta, *args[1:]) - func(args[0] - delta, *args[1:])) / (2 * delta)
         return nabl

@@ -19,7 +19,7 @@ def main():
     method5 = Golden()
     method6 = AdaGrad(lr=const_learning_rate(100), max_iter=1000)
     method7 = RMSProp(lr=exp_learning_rate(10))
-    mainMethod = method7  # основной метод (solver 3,4,5)
+    mainMethod = method1  # основной метод (solver 3,4,5)
 
     solver1 = DogLeg_Met()
     solver2 = GN_Met()
@@ -28,44 +28,23 @@ def main():
     solver5 = Stochastic(method=mainMethod)
     solver6 = BFGS()
     solver7 = L_BFGS()
-    mainSolver = solver7  # основной солвер
+    mainSolver = solver4  # основной солвер
 
-    solversTeam = [solver1, solver2]
 
     mult_tests_visuals(
-    solversTeam, 
+    [
+        solver1,
+        solver2
+        ], 
     result_norm_test, 
-    mult_test_noise, 
+    mult_test_dimensions, 
     [i + 1 for i in range(10)],
-    ["DogLeg", "GN"],
+    [
+        "DogLeg",
+        "GN"
+        ],
     test_number_for_iteration=10
     )
-
-    st = time.time_ns()
-    mem = cool_visual(solver7, data_size=100)
-    print("Время выполнения LBfgs:")
-    print((time.time_ns() - st) / 10 ** 9)
-    print("Mem выполнения LBfgs:")
-    print(mem)
-    print()
-
-    func, real, init = generate_random_func_and_params(noise_init=3, noise_real=10)
-    st = time.time_ns()
-    mem = cool_visual_determined_func(mainSolver, func, real, init, data_size=100)
-    print("Время выполнения Lbfgs:")
-    print((time.time_ns() - st) / 10 ** 9)
-    print("Mem выполнения Lbfgs:")
-    print(mem)
-    print()
-
-    st = time.time_ns()
-    mem = cool_visual_determined_func(solver6, func, real, init, data_size=100)
-    print("Время выполнения Bfgs:")
-    print((time.time_ns() - st) / 10 ** 9)
-    print("Mem выполнения Bfgs:")
-    print(mem)
-    print()
-
 
 if __name__ == "__main__":
     main()
