@@ -1,10 +1,11 @@
 import numpy as np
+import torch
 
 
 def gen_points_with_source_f(count, disp, calc):
     return np.array(sorted(
-        [(x := 0.05 * np.random.rand() + (i - count / 2) / (count / 3), calc(x) + np.random.normal(scale=disp)) for i in
-         range(count)], key=lambda x: x[0])), calc
+        [(x := 1.0 * np.random.rand() + (i - count / 2) / (count / 3), calc(x) + np.random.normal(scale=disp))
+         for i in range(count)], key=lambda x: x[0])), calc
 
 
 def gen_loss(ps):
@@ -16,12 +17,13 @@ def gen_loss(ps):
 
 
 def elastic_regression(p, ps, gd, alpha=0.5, lda=1):
+    pt = torch.tensor(ps,requires_grad=True)
     def loss_fun(x):
-        return sum((ps[:, 1] - sum(x[i] * ps[:, 0] ** i for i in range(len(x)))) ** 2) / p + lda * (
-                    alpha * sum(map(abs, x)) + (1 - alpha) / 2 * sum(x ** 2))
+        return sum((pt[:, 1] - sum(x[i] * pt[:, 0] ** i for i in range(len(x)))) ** 2) / p + lda * (
+                alpha * sum(map(abs, x)) + (1 - alpha) / 2 * sum(x ** 2))
 
     x = np.array([0.0] * (p + 1))
-    return (points := gd(loss_fun, x)[-1]), len(points)
+    return gd(loss_fun, x)[-1]
 
 
 def poly_regression(p, points, gd):

@@ -1,8 +1,9 @@
 from collections import deque
 
 import numpy as np
+import torch
 
-from Lab4.util.grad_util import get_hessian, get_grad, line_search
+from Lab4.util.grad_util import get_hessian, line_search, pytorch_grad, numeric_grad, get_grad
 from Lab4.lib_unwrapped.method_gd import Nesterov, Momentum, AdaGrad, RMSProp, Adam
 from Lab4.lib_unwrapped.method_newton import GaussNewton, PowellDogLeg
 
@@ -40,7 +41,7 @@ def bfgs(f, x, lim=500):
     points.append(x)
     while True:
         if g is None:
-            g = get_grad(f, x)
+            g = pytorch_grad(f, x)
 
         if np.linalg.norm(g) < eps:
             break
@@ -55,9 +56,9 @@ def bfgs(f, x, lim=500):
         if len(points) > lim:
             break
 
-        newg = get_grad(f, x)
-        y = newg - g
-        g = newg
+        new_grad = pytorch_grad(f, x)
+        y = new_grad - g
+        g = new_grad
 
         I = np.eye(n)
         rho = 1 / (y.T @ delta)
@@ -67,8 +68,8 @@ def bfgs(f, x, lim=500):
     return np.array(points)
 
 
-def l_bfgs(f, x, m=8, lim=500):
-    eps = 1e-6
+def l_bfgs(f, x, m=10, lim=500):
+    eps = 1e-5
     n = len(x)
     points = []
     rho_queue = deque(maxlen=m)
@@ -78,7 +79,7 @@ def l_bfgs(f, x, m=8, lim=500):
     points.append(x)
     while True:
         if grad is None:
-            grad = get_grad(f, x)
+            grad = pytorch_grad(f, x)
 
         if np.linalg.norm(grad) < eps:
             break
@@ -86,10 +87,10 @@ def l_bfgs(f, x, m=8, lim=500):
         alpha_q = []
 
         q = grad
-        for s, rho, y in zip(reversed(s_queue), reversed(rho_queue), reversed(y_queue)):
-            alpha = rho * np.outer(s.T, q)
+        for i in range(len(s_queue) - 1, -1, -1):
+            alpha = rho_queue[i] * np.outer(s_queue[i].T, q)
             alpha_q.append(alpha)
-            q = q - alpha @ y
+            q = q - alpha @ y_queue[i]
 
         try:
             gamma = (s_queue[-1].T @ y_queue[-1]) / (y_queue[-1].T @ y_queue[-1])
@@ -99,9 +100,9 @@ def l_bfgs(f, x, m=8, lim=500):
 
         z = H @ q
 
-        for s, rho, y, alpha in zip(s_queue, rho_queue, y_queue, reversed(alpha_q)):
-            beta = rho * np.outer(y.T, z)
-            z = z + s @ (alpha - beta)
+        for i in range(0, len(s_queue), 1):
+            beta = rho_queue[i] * np.outer(y_queue[i].T, z)
+            z = z + s_queue[i] @ (alpha_q[len(s_queue) - i - 1] - beta)
 
         p = -z
         alpha = line_search(f, x, p)
@@ -113,7 +114,7 @@ def l_bfgs(f, x, m=8, lim=500):
         if len(points) > lim:
             break
 
-        new_grad = get_grad(f, x)
+        new_grad = pytorch_grad(f, x)
         y = new_grad - grad
         y_queue.append(y)
         grad = new_grad

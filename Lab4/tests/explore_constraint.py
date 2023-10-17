@@ -4,6 +4,7 @@ from functools import partial
 
 from Lab4.util.run_functions import run_and_return_result
 
+
 # хуй знает, думаю, достаточно показать, что работает
 
 def constraint_test(start, func):
@@ -35,16 +36,16 @@ def constraint_test(start, func):
 
     all_regrs = [
         (partial(scipy.optimize.minimize), "No constraints"),
-        (partial(scipy.optimize.minimize, constraints=c1), "y >= 0.5x"),
-        (partial(scipy.optimize.minimize, constraints=c2), "y <= 2x"),
-        (partial(scipy.optimize.minimize, constraints=c3), "y <= x"),
-        (partial(scipy.optimize.minimize, constraints=c4), "y >= x"),
-        (partial(scipy.optimize.minimize, constraints=c5), "y = x"),
-        (partial(scipy.optimize.minimize, constraints=nlc1), "B((1, 1), 1)"),
-        (partial(scipy.optimize.minimize, constraints=nlc2), "B((0, 1), 1)"),
-        (partial(scipy.optimize.minimize, constraints=nlc3), "B((0, 0), 1)"),
-        (partial(scipy.optimize.minimize, constraints=nlc4), "not B((1, 1), 1)"),
-        (partial(scipy.optimize.minimize, constraints=nlc5), "not B((0, 0), 1)"),
+        (partial(scipy.optimize.minimize, constraints=c1), "y >= 0.5x //перекрываем долину в функции"),
+        (partial(scipy.optimize.minimize, constraints=c2), "y <= 2x //подталкиваем к точке минимума"),
+        (partial(scipy.optimize.minimize, constraints=c3), "y <= x //проходим по точке минимума"),
+        (partial(scipy.optimize.minimize, constraints=c4), "y >= x //проходим по точке минимума"),
+        (partial(scipy.optimize.minimize, constraints=c5), "y = x //проходим по точке минимума"),
+        (partial(scipy.optimize.minimize, constraints=nlc1), "B((1, 1), 1) //круг с радиусом 1 от (1, 1)"),
+        (partial(scipy.optimize.minimize, constraints=nlc2), "B((0, 1), 1) //круг с радиусом 1 от (0, 1)"),
+        (partial(scipy.optimize.minimize, constraints=nlc3), "B((0, 0), 1) //круг с радиусом 1 от (0, 0)"),
+        (partial(scipy.optimize.minimize, constraints=nlc4), "not B((1, 1), 1) //вне круга с радиусом 1 от (1, 1)"),
+        (partial(scipy.optimize.minimize, constraints=nlc5), "not B((0, 0), 1) //вне круга с радиусом 1 от (0, 0)"),
     ]
 
     for regr, name in all_regrs:
@@ -60,9 +61,11 @@ def main():
     def rosenbrock(x):  # Rosenbrock function
         return 100 * (x[1] - x[0] ** 2) ** 2 + (1 - x[0]) ** 2
 
+    print("Rosenbrock function: 100(y-x^2)^2+(1-x^2)")
     constraint_test(start, rosenbrock)
     print('=====================================\n')
-    constraint_test(start, lambda x: (x[0] - 1) ** 2 + (x[1] - 1) ** 4)
+    print('(x-1)^2-7xy+(y-1)^4')
+    constraint_test(start, lambda x: (x[0] - 1) ** 2 - 7 * x[0] * x[1] + (x[1] - 1) ** 4)
 
 
 if __name__ == "__main__":
