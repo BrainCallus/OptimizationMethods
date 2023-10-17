@@ -48,7 +48,7 @@ def run_cusom_and_torch(x, f, my_impl, torch_impl):
     return run_and_return_result(lambda: my_impl(f, x)), run_and_return_result(lambda: run_torch_gd(torch_impl, f, xt))
 
 
-def run_scipy_method(p, points, method, lim=500):
+def run_scipy_method(p, points, method):
     x = np.array([0] * (p + 1))
     result = method(gen_loss(points), x)
     return result.x

@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 import numpy as np
+import torch
 
 from Lab4.util.grad_util import get_jacobian
 

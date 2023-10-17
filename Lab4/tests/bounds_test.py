@@ -44,13 +44,13 @@ def time_menory_test(bounds, func, iters, p):
 
 
 def main():
-    p = 3
-    iters = 20
-    f = lambda x: 3 + 3 * x + 3 * x ** 2
+    p = 6
+    iters = 100
+    f = lambda x: 2 * np.sqrt(np.exp(x ** 3)) - x ** 3 + 4 * x ** 2 - 8
 
-    bounds = range(5, 100, 5)
-    # for i in range(5, 100, 5):
-    time_menory_test(bounds, f, iters, p)
+    bounds = [0.1, 0.25, 0.5, 1.0, 5.0, 10.0, 20.0, 50.0, 100.0, 150.0, 200.0, 300.0,
+              400.0, 500.0, 600.0, 800.0, 900.0, 1000.0]
+    time_menory_test(np.array(bounds), f, iters, p)
 
 
 if __name__ == "__main__":

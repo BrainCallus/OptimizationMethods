@@ -52,7 +52,7 @@ def plot_both_regr(p, points, ax, my_impl, scipy_impl, name):
     def gen_restore(c):
         return lambda x: restore_coefs(c, x)
 
-    ax.plot(X, gen_restore(c1.result[0])(X))
+    ax.plot(X, gen_restore(c1.result)(X))
     ax.plot(X, gen_restore(c2.result)(X))
 
     title = f"{name}"
@@ -83,6 +83,5 @@ def draw_dependence_graph(parameter_name, mapper, results_by_name, bounds):
     plt.title(f'{parameter_name} dependence on bounds')
     plt.xlabel("bounds")
     plt.ylabel(f'{parameter_name}')
-    # plt.grid()
     plt.legend()
     plt.show()

@@ -23,16 +23,15 @@ def get_jacobian(f, x: np.ndarray):
     j = ndt.Jacobian(f)
     return j(x)
 
-
 def get_hessian(f, x: np.ndarray):
-    h = ndt.Hessian(f)
-    return h(x)
+    return torch.autograd.functional.hessian(f, torch.tensor(x))
 
 
 def check_wolfe_cond(f, x: np.ndarray, alpha, direction, c1=0.1, c2=0.9):
-    grad = get_grad(f, x)
-    return f(x + alpha * direction) <= f(x) + alpha * c1 * np.dot(direction, grad) and \
-        abs(np.dot(direction, get_grad(f, x + alpha * direction))) <= abs(c2 * np.dot(direction, grad))
+    grad = pytorch_grad(f, x)
+    t = torch.tensor(x)
+    return f(t + alpha * direction) <= f(t) + alpha * c1 * np.dot(direction, grad) and \
+        abs(np.dot(direction, pytorch_grad(f, x + alpha * direction))) <= abs(c2 * np.dot(direction, grad))
 
 
 def line_search(f, x: np.ndarray, direction):

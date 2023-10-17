@@ -1,7 +1,7 @@
 import numpy as np
 from abc import abstractmethod
 
-from Lab4.util.grad_util import get_grad
+from Lab4.util.grad_util import pytorch_grad
 
 
 class MethodGd:
@@ -11,7 +11,6 @@ class MethodGd:
     def execute(self, func, start_x, lr, lim=500):
         ee = 1e-8
         x = start_x
-        n = len(start_x)
         points = [start_x]
         while True:
             delta = self.get_delta(func, x, lr, ee, len(points))
@@ -36,7 +35,7 @@ class Nesterov(MethodGd):
         self.v = np.array([0] * dim)
 
     def get_delta(self, func, x, lr, ee, length):
-        self.v = self.moment * self.v + (g := get_grad(func, x))
+        self.v = self.moment * self.v + (g := pytorch_grad(func, x))
         return - lr * (g + self.moment * self.v)
 
 
@@ -47,7 +46,7 @@ class RMSProp(MethodGd):
         self.s = 0
 
     def get_delta(self, func, x, lr, ee, length):
-        gradient = get_grad(func, x)
+        gradient = pytorch_grad(func, x)
         self.s = self.s * self.beta + (1 - self.beta) * np.dot(gradient, gradient)
         return - lr * gradient / np.sqrt(self.s + ee)
 
@@ -59,7 +58,7 @@ class Momentum(MethodGd):
         self.v = np.array([0] * dim)
 
     def get_delta(self, func, x, lr, ee, length):
-        self.v = self.moment * self.v - lr * get_grad(func, x)
+        self.v = self.moment * self.v - lr * pytorch_grad(func, x)
         return self.v
 
 
@@ -69,7 +68,7 @@ class AdaGrad(MethodGd):
         self.G = 0
 
     def get_delta(self, func, x, lr, ee, length):
-        grad = get_grad(func, x)
+        grad = pytorch_grad(func, x)
         self.G += np.dot(grad, grad)
         return - lr * grad / np.sqrt(self.G + ee)
 
@@ -83,7 +82,7 @@ class Adam(MethodGd):
         self.v = np.array([0] * dim)
 
     def get_delta(self, func, x, lr, ee, length):
-        grad = get_grad(func, x)
+        grad = pytorch_grad(func, x)
         self.v = self.v * self.beta1 + (1 - self.beta1) * grad
         self.s = self.s * self.beta2 + (1 - self.beta2) * np.dot(grad, grad)
         v_ = self.v / (1 - self.beta1 ** length)
