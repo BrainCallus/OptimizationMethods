@@ -40,14 +40,14 @@ def time_memory_test(iters, p, func, func_name):
 
 
 def main():
-    f = lambda x: 5 * x ** 3 - 8 * x ** 2 - x + 9
-    p = 3
+    f = lambda x: np.exp(x*np.sin(x)**2)-4*x
+    p = 7
     points, src = gen_points_with_source_f(30, 3, f)
     all_regrs = [
-        (partial(poly_regression, gd=bfgs), partial(scipy.optimize.minimize, method="BFGS"), "BFGS"),
-        (partial(poly_regression, gd=l_bfgs), partial(scipy.optimize.minimize, method="L-BFGS-B"), "L-BFGS"),
+        #(partial(poly_regression, gd=bfgs), partial(scipy.optimize.minimize, method="BFGS"), "BFGS"),
+        #(partial(poly_regression, gd=l_bfgs), partial(scipy.optimize.minimize, method="L-BFGS-B"), "L-BFGS"),
         (gauss_newton, scipy.optimize.least_squares, "Gauss-Newton"),
-        (dog_leg, partial(scipy.optimize.least_squares, method="dogbox"), "Powell's Dog Leg"),
+        (gauss_newton, partial(scipy.optimize.least_squares, method="dogbox"), "Powell's Dog Leg"),
     ]
 
     for regr in all_regrs:

@@ -1,0 +1,13 @@
+.idea/
+/.idea
+*.iml
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+__pycache__/
+.cache
+target/

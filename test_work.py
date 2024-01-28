@@ -26,8 +26,6 @@ def main():
     solver7 = L_BFGS()
     mainSolver = solver7  # основной солвер
 
-    
-    
     # Массовые тесты
 
     # список методов, которые будут тестироваться
@@ -40,9 +38,9 @@ def main():
 
     # Тесты по оси х
 
-    mult_test = mult_test_noise 
-    #mult_test = mult_test_dimensions, 
-    #mult_test mult_size_data_size
+    mult_test = mult_test_noise
+    # mult_test = mult_test_dimensions,
+    # mult_test mult_size_data_size
 
     # Результаты тестов по оси у
 
@@ -63,25 +61,23 @@ def main():
     # то есть, буквально, если есть 3 солвера, len(mass_param) = 2 
     # и коичество = 10, то будет проведено всего 60 тестов.
 
-    
-
-
     mult_tests_visuals(
-    solvers = solversTeam, 
-    test_function = test, 
-    mult_test_function = mult_test, 
-    names = names,
-    params = mass_param,
-    test_number_for_iteration = test_number,
-    noise_init = 10,
-    noise_real = 100,
-    noise = 10,
-    data_size = 100,
-    dimensions = 4
+        solvers=solversTeam,
+        test_function=test,
+        mult_test_function=mult_test,
+        names=names,
+        params=mass_param,
+        test_number_for_iteration=test_number,
+        noise_init=10,
+        #noise_real=100,
+        noise=10,
+        data_size=100,
+        dimensions=4
     )
 
     # Если проходит тест по шумам, и указать параметр "noise", 
     # он ни на что не повлияет 
+
 
 if __name__ == "__main__":
     main()

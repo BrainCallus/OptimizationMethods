@@ -32,17 +32,17 @@ class absBFGS(absRegression, ABC):
         return i, i
 
     def line_search(self, x, p, c1=0.001, c2=0.9, alf=1):
-        nabl = self.func.grad(x)
+        nabl = self.func.get_grad(x)
         fx = self.func.func(x)
         new_x = x + alf * p
-        new_nabl = self.func.grad(new_x)
+        new_nabl = self.func.get_grad(new_x)
         f_new_x = self.func.func(new_x)
         while ((f_new_x > fx + (c1 * alf * nabl.T @ p)
                 or math.fabs(new_nabl.T @ p) > c2 * math.fabs(nabl.T @ p)) and abs(f_new_x - fx) >= 1e-8):
             alf *= 0.5
             new_x = x + alf * p
             f_new_x = self.func.func(new_x)
-            new_nabl = self.func.grad(new_x)
+            new_nabl = self.func.get_grad(new_x)
         return alf
 
     @abstractmethod
@@ -62,7 +62,7 @@ class BFGS(absBFGS):
         dim = len(self.coefficients)
         H = np.eye(dim)
         I = np.eye(dim)
-        nabl = (self.func.grad(self.coefficients))
+        nabl = (self.func.get_grad(self.coefficients))
         c = 1e-7
         delta = 100
         while delta > self.eps and i < self.max_iter:
@@ -70,7 +70,7 @@ class BFGS(absBFGS):
             alf = self.line_search(self.coefficients, p)
             s = alf * p
             self.coefficients += s
-            new_nabl = self.func.grad(self.coefficients)
+            new_nabl = self.func.get_grad(self.coefficients)
             y = new_nabl - nabl
             p = y @ s
             ro = 1.0 / (p + c)
@@ -95,14 +95,14 @@ class L_BFGS(absBFGS):
     def execute(self):
         main_list = LinkedList(self.queue_sz)
         i = 1
-        grad = self.func.grad(self.coefficients)
+        grad = self.func.get_grad(self.coefficients)
         x_prev = np.zeros(len(self.coefficients))
         grad_prev = grad - grad
         ys = 100
         c = 1e-9
 
         while np.linalg.norm(ys) > self.eps and i < self.max_iter:
-            q = self.func.grad(grad)
+            q = self.func.get_grad(grad)
 
             nnode = main_list.last
             while nnode is not None:
@@ -125,7 +125,7 @@ class L_BFGS(absBFGS):
 
             alf = self.line_search(self.coefficients, -r)
             self.coefficients -= r * alf
-            grad = self.func.grad(self.coefficients)
+            grad = self.func.get_grad(self.coefficients)
 
             if main_list.size != 0:
                 main_list.insert(self.coefficients - x_prev, grad - grad_prev,

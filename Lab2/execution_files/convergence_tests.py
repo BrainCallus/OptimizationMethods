@@ -1,9 +1,8 @@
-from Lab2.execute_lib.excel import make_excel_table
-from Lab2.execute_lib.graphics import show_tests_graph, show_3d_plot
 from Lab2.lib.methods import *
 from Lab2.lib.learning_rates import *
 from Lab2.lib.functions_and_gradients import *
 from Lab2.lib.regularization import *
+
 
 def convergence_test(l):
     res = []
@@ -11,8 +10,10 @@ def convergence_test(l):
         res.append(l[i + 1] / l[i])
     return res
 
+
 def mini_convergence_test(l):
     return l[-1] / l[-2]
+
 
 reg = NoRegularization()
 
@@ -33,7 +34,6 @@ rms_prop = RMSProp(lr=lr, regularization=reg)
 
 lr = const_learning_rate(0.1)
 adam = Adam(lr=lr, regularization=reg)
-
 
 func = lambda x: x[0] ** 2 + 9 * x[1] ** 2 + 5
 grad = lambda x: [2 * x[0], 18 * x[1]]

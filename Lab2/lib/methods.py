@@ -48,7 +48,7 @@ class Method(ABC):
 
     @staticmethod
     def calc_grad(f, x):
-        return np.asarray(f.grad(x))
+        return np.asarray(f.get_grad(x))
 
     def calc_func(self, f, x):
         return self.regularization.calc(f, x)

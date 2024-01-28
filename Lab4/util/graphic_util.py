@@ -53,7 +53,7 @@ def plot_both_regr(p, points, ax, my_impl, scipy_impl, name):
         return lambda x: restore_coefs(c, x)
 
     ax.plot(X, gen_restore(c1.result)(X))
-    ax.plot(X, gen_restore(c2.result)(X))
+   # ax.plot(X, gen_restore(c2.result)(X))
 
     title = f"{name}"
     if ax == plt:
