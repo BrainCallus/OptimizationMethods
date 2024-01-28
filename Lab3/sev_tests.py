@@ -49,7 +49,6 @@ def cool_visual_internal(solver: absRegression, func, real, init, noise: int = 2
     x = np.arange(1, 1 + data_size)
     y = func(x, real)
     yn = y + noise * np.random.randn(data_size)
-    print(real)
 
     solver.function = func
     tracemalloc.start()
@@ -58,6 +57,8 @@ def cool_visual_internal(solver: absRegression, func, real, init, noise: int = 2
     tracemalloc.stop()
     computed = solver.getComputedCoefficients()
     divergence = solver.getDivergence()
+
+    print(solver.getResult())
 
     y = func(x, real)
     plt.figure()
@@ -197,10 +198,10 @@ def mult_tests_visuals(
         names: list,
         test_number_for_iteration: int = 100,
         noise_init: int = 10,
+        noise_real: int = 10,
         noise: int = 10,
         data_size: int = 100,
-        dimensions = 4,
-
+        dimensions: int = 4
 ):
     res = mult_test_function.exec(
         solvers,
@@ -208,6 +209,7 @@ def mult_tests_visuals(
         params,
         test_number_for_iteration,
         noise_init,
+        noise_real,
         noise,
         data_size,
         dimensions
@@ -257,12 +259,13 @@ def mult_tests(
         yn = y + noise * np.random.randn(data_size)
 
     for i in range(test_number):
-        init = noise_init * np.random.random(len(real))
+        init = real + noise_init * np.random.random(len(real))
         if not same_data:
             x = np.arange(1, 1 + data_size)
             y = func(x, real)
             yn = y + noise * np.random.randn(data_size)
         for i in range(len(solvers)):
+            print(real)
             res[i] += test_function.exec(solvers[i], init, x, yn, real)
 
     if console:
